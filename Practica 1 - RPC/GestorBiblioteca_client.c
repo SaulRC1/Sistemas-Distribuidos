@@ -205,11 +205,18 @@ void MostrarLibro(TLibro *L, int Pos, bool_t Cabecera)
 	printf("     %s%s%-*d\n",A ,PI,12, L->Anio);
 }
 
-void handleMainMenuOption1()
+void handleMainMenuOption1(CLIENT *clnt)
 {
 	Cls;
+
+	Cadena password;
+
 	printf("Por favor inserte la contraseña de Administración: ");
-	scanf("%s", cadena);
+	__fpurge(stdin);
+	scanf("%s", password);
+
+	int *connection_result = conexion_1(&password, clnt);
+	printf("%d", *connection_result);
 }
 
 int
@@ -242,7 +249,7 @@ main (int argc, char *argv[])
 
 		if(opcion == 1)
 		{
-			handleMainMenuOption1();
+			handleMainMenuOption1(clnt);
 		}
 
 

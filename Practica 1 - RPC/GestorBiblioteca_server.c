@@ -5,6 +5,8 @@
  */
 
 #include "GestorBiblioteca.h"
+#include <time.h>
+#include <stdlib.h>
 
 //Vector dinámico de libros
 TLibro *Biblioteca=NULL;
@@ -23,6 +25,8 @@ Cadena NomFichero="";
 
 //Copia del último campo de ordenación especificado.
 int CampoOrdenacion=0;
+
+static int is_random_seed_initialized = 0;
 
 bool_t EsMenor(int P1, int P2, int Campo)
 {
@@ -59,9 +63,30 @@ conexion_1_svc(char *argp, struct svc_req *rqstp)
 {
 	static int  result;
 
-	/*
-	 * insert server code here
-	 */
+	//Initialize random seed only once per program execution
+	if (is_random_seed_initialized == 0) 
+	{ 
+        srand(time(NULL));
+        is_random_seed_initialized = 1;
+    }
+
+	//Check if password given by the client is correct
+	if(strcmp(argp, "1234") != 0)
+	{
+		result = -2;
+		return &result;
+	}
+
+	if(IdAdmin == -1) //There is no admin connected yet
+	{
+		IdAdmin = 1 + rand() % RAND_MAX;
+		result = IdAdmin;
+	}
+	else
+	{
+		//There is an admin connected
+		result = -1;
+	}
 
 	return &result;
 }
