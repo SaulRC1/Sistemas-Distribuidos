@@ -96,9 +96,15 @@ desconexion_1_svc(int *argp, struct svc_req *rqstp)
 {
 	static bool_t  result;
 
-	/*
-	 * insert server code here
-	 */
+	if(*argp == IdAdmin)
+	{
+		result = TRUE;
+		IdAdmin = -1;
+	}
+	else
+	{
+		result = FALSE;
+	}
 
 	return &result;
 }
