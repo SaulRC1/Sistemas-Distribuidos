@@ -216,7 +216,37 @@ void handleMainMenuOption1(CLIENT *clnt)
 	scanf("%s", password);
 
 	int *connection_result = conexion_1(&password, clnt);
-	printf("%d", *connection_result);
+
+	if (connection_result == (int *) NULL) 
+	{
+		clnt_perror (clnt, "La llamada a la función ha fallado");
+		return;
+	}
+	
+	if(*connection_result == -1)
+	{
+		printf("Ya existe un usuario identificado como administrador\n");
+		Pause;
+	}
+	else if(*connection_result == -2)
+	{
+		printf("Contraseña de administrador incorrecta\n");
+		Pause;
+	}
+	else
+	{
+		printf("Identificado satisfactoriamente como administrador\n");
+		Pause;
+
+		int option = -1;
+
+		do
+		{
+			option = MenuAdministracion();
+			
+		} while (option != 0);
+		
+	}
 }
 
 int
