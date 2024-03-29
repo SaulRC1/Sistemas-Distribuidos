@@ -222,6 +222,12 @@ void handleAdminMenuOption0(int id_admin, CLIENT *clnt)
 {
 	bool_t *disconnection_result = desconexion_1(&id_admin, clnt);
 
+	if (disconnection_result == (bool_t *)NULL)
+	{
+		clnt_perror(clnt, "La llamada a la función ha fallado");
+		return;
+	}
+
 	if (*disconnection_result == TRUE)
 	{
 		printf("Administrador desconectado\n");
@@ -233,6 +239,46 @@ void handleAdminMenuOption0(int id_admin, CLIENT *clnt)
 					se procederá a cerrar su sesión\n");
 		Pause;
 		exit(1);
+	}
+}
+
+void handleAdminMenuOption1(int id_admin, CLIENT *clnt)
+{
+	Cls;
+
+	Cadena file_name;
+
+	printf("Introduce el nombre del fichero de datos: ");
+	__fpurge(stdin);
+	scanf("%s", file_name);
+
+	TConsulta query;
+	query.Ida = id_admin;
+	strcpy(query.Datos, file_name);
+
+	int *result = cargardatos_1(&query, clnt);
+
+	if (result == (int *)NULL)
+	{
+		clnt_perror(clnt, "La llamada a la función ha fallado");
+		return;
+	}
+
+	if(*result == -1)
+	{
+		printf("Ya hay un usuario identificado como administrador, o bien el ID de administrador " \
+		"no coincide.\n");
+		Pause;
+	}
+	else if(*result == 0)
+	{
+		printf("Error al cargar los datos de la biblioteca\n");
+		Pause;
+	}
+	else if(*result == 1)
+	{
+		printf("Datos de la biblioteca cargados correctamente\n");
+		Pause;
 	}
 }
 
@@ -282,7 +328,7 @@ void handleMainMenuOption1(CLIENT *clnt)
 			}
 			else if(option == 1)
 			{
-
+				handleAdminMenuOption1(id_admin, clnt);
 			}
 
 		} while (option != 0);
@@ -327,7 +373,11 @@ int main(int argc, char *argv[])
 		}
 		else if(opcion == 3)
 		{
-			
+
+		}
+		else if(opcion == 4)
+		{
+
 		}
 
 	} while (opcion != 0);

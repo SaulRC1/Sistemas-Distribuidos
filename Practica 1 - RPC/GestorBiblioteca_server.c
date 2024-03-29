@@ -58,6 +58,14 @@ bool_t EsMenor(int P1, int P2, int Campo)
 	return salida;
 }
 
+TLibro * increment_library_size(TLibro *library, int current_size, 
+	int increment)
+{
+	TLibro *incremented_library = realloc(library, (current_size + increment) * sizeof(TLibro));
+
+	return incremented_library;
+}
+
 int *
 conexion_1_svc(char *argp, struct svc_req *rqstp)
 {
@@ -114,9 +122,61 @@ cargardatos_1_svc(TConsulta *argp, struct svc_req *rqstp)
 {
 	static int  result;
 
-	/*
-	 * insert server code here
-	 */
+	if(argp->Ida != IdAdmin && argp->Ida < 0)
+	{
+		result = -1;
+		return &result;
+	}
+
+	//Open file for reading binary data
+	FILE *library_file = fopen(argp->Datos, "rb");
+
+	if(library_file == NULL)
+	{
+		result = 0;
+		return &result;
+	}
+
+	//Store the latest file opened
+	strcpy(NomFichero, argp->Datos);
+
+	//Delete the previous library content
+	if(Biblioteca != NULL)
+	{
+		free(Biblioteca);
+		Tama = 0;
+		NumLibros = 0;
+	}
+
+	Biblioteca = malloc(4 * sizeof(TLibro));
+	Tama = 4;
+
+	fread(&NumLibros, sizeof(int), 1, library_file);
+	
+	int library_index = 0;
+
+	while(!feof(library_file))
+	{
+		if(library_index >= Tama)
+		{
+			Biblioteca = increment_library_size(Biblioteca, Tama, 4);
+
+			if(Biblioteca == NULL)
+			{
+				result = 0;
+				return &result;
+			}
+
+			Tama = Tama + 4;
+		}
+
+		fread(&Biblioteca[library_index], sizeof(TLibro), 1, library_file);
+
+		library_index++;
+	}
+
+	fclose(library_file);
+	result = 1;
 
 	return &result;
 }
