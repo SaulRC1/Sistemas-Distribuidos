@@ -66,6 +66,41 @@ TLibro * increment_library_size(TLibro *library, int current_size,
 	return incremented_library;
 }
 
+int partition(TLibro *library, int low, int high, int sorting_field)
+{
+	int pivot = high;
+
+	int i = (low - 1);
+
+	for (int j = low; j <= high; j++)
+	{
+		if(EsMenor(j, pivot, sorting_field) == TRUE)
+		{
+			i++;
+			TLibro aux = library[i];
+			library[i] = library[j];
+			library[j] = aux;
+		}
+	}
+
+	TLibro aux = library[i + 1];
+	library[i + 1] = library[high];
+	library[high] = aux;
+
+	return (i + 1);
+}
+
+void quick_sort(TLibro *library, int low, int high, int sorting_field)
+{
+	if(low < high)
+	{
+		int pi = partition(library, low, high, sorting_field);
+
+		quick_sort(library, low, pi - 1, sorting_field);
+		quick_sort(library, pi + 1, high, sorting_field);
+	}
+}
+
 int *
 conexion_1_svc(char *argp, struct svc_req *rqstp)
 {
@@ -122,7 +157,7 @@ cargardatos_1_svc(TConsulta *argp, struct svc_req *rqstp)
 {
 	static int  result;
 
-	if(argp->Ida != IdAdmin && argp->Ida < 0)
+	if(argp->Ida != IdAdmin || argp->Ida < 0)
 	{
 		result = -1;
 		return &result;
@@ -177,6 +212,8 @@ cargardatos_1_svc(TConsulta *argp, struct svc_req *rqstp)
 
 	fclose(library_file);
 	result = 1;
+
+	quick_sort(Biblioteca, 0, Tama - 1, CampoOrdenacion);
 
 	return &result;
 }
@@ -234,9 +271,23 @@ ordenar_1_svc(TOrdenacion *argp, struct svc_req *rqstp)
 {
 	static bool_t  result;
 
-	/*
-	 * insert server code here
-	 */
+	if(argp->Ida != IdAdmin || argp->Ida < 0)
+	{
+		result = FALSE;
+		return &result;
+	}
+
+	if(Biblioteca == NULL)
+	{
+		result = FALSE;
+		return &result;
+	}
+
+	quick_sort(Biblioteca, 0, Tama - 1, argp->Campo);
+
+	CampoOrdenacion = argp->Campo;
+
+	result = TRUE;
 
 	return &result;
 }
