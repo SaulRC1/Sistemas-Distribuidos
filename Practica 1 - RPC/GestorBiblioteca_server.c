@@ -235,9 +235,13 @@ nuevolibro_1_svc(TNuevo *argp, struct svc_req *rqstp)
 {
 	static int  result;
 
-	/*
-	 * insert server code here
-	 */
+	if(argp->Ida != IdAdmin || argp->Ida < 0)
+	{
+		result = -1;
+		return &result;
+	}
+
+
 
 	return &result;
 }
@@ -297,9 +301,7 @@ nlibros_1_svc(int *argp, struct svc_req *rqstp)
 {
 	static int  result;
 
-	/*
-	 * insert server code here
-	 */
+	result = NumLibros;
 
 	return &result;
 }
@@ -321,9 +323,38 @@ descargar_1_svc(TPosicion *argp, struct svc_req *rqstp)
 {
 	static TLibro  result;
 
-	/*
-	 * insert server code here
-	 */
+	if(argp->Pos >= NumLibros || argp->Pos < 0)
+	{
+		result.Anio = 0;
+		strcpy(result.Autor, "????");
+		strcpy(result.Idioma, "????");
+		strcpy(result.Isbn, "????");
+		result.NoLibros = 0;
+		result.NoListaEspera = 0;
+		result.NoPrestados = 0;
+		strcpy(result.Pais, "????");
+		strcpy(result.Titulo, "????");
+
+		return &result;
+	}
+
+	TLibro book = Biblioteca[argp->Pos];
+
+	result.Anio = book.Anio;
+	strcpy(result.Autor, book.Autor);
+	strcpy(result.Idioma, book.Idioma);
+	strcpy(result.Isbn, book.Isbn);
+	result.NoLibros = book.NoLibros;
+	result.NoListaEspera = book.NoListaEspera;
+	result.NoPrestados = book.NoPrestados;
+	strcpy(result.Pais, book.Pais);
+	strcpy(result.Titulo, book.Titulo);
+
+	if(argp->Ida != IdAdmin || argp->Ida < 0)
+	{
+		result.NoListaEspera = 0;
+		result.NoPrestados = 0;
+	}
 
 	return &result;
 }

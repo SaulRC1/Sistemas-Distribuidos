@@ -282,6 +282,55 @@ void handleAdminMenuOption1(int id_admin, CLIENT *clnt)
 	}
 }
 
+void handleAdminMenuOption8(int id_admin, CLIENT *clnt)
+{
+	Cls;
+
+	int *number_of_books = nlibros_1(&id_admin, clnt);
+
+	if (number_of_books == (int *)NULL)
+	{
+		clnt_perror(clnt, "La llamada a la función ha fallado");
+		return;
+	}
+
+	if(*number_of_books == 0)
+	{
+		printf("No hay libros cargados en la biblioteca.\n");
+		Pause;
+		return;
+	}
+
+	printf("Libros en la biblioteca: %d\n", *number_of_books);
+
+	TPosicion position;
+	position.Ida = id_admin;
+
+	for (int i = 0; i < *number_of_books; i++)
+	{
+		position.Pos = i;
+
+		TLibro *book = descargar_1(&position, clnt);
+
+		if (book == (TLibro *)NULL)
+		{
+			clnt_perror(clnt, "La llamada a la función ha fallado");
+			return;
+		}
+
+		if(i == 0)
+		{
+			MostrarLibro(book, i, TRUE);
+		}
+		else
+		{
+			MostrarLibro(book, i, FALSE);
+		}
+	}
+	
+	Pause;
+}
+
 void handleMainMenuOption1(CLIENT *clnt)
 {
 	Cls;
@@ -329,6 +378,10 @@ void handleMainMenuOption1(CLIENT *clnt)
 			else if(option == 1)
 			{
 				handleAdminMenuOption1(id_admin, clnt);
+			}
+			else if(option == 8)
+			{
+				handleAdminMenuOption8(id_admin, clnt);
 			}
 
 		} while (option != 0);
