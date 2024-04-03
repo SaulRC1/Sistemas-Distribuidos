@@ -128,6 +128,13 @@ void gestorbiblioteca_1(char *host)
 #endif /* DEBUG */
 }
 
+struct BookValidationResult {
+	bool_t validation_result;
+	Cadena error;
+};
+
+typedef struct BookValidationResult BookValidationResult;
+
 int MenuPrincipal()
 {
 	int Salida;
@@ -282,6 +289,224 @@ void handleAdminMenuOption1(int id_admin, CLIENT *clnt)
 	}
 }
 
+void handleAdminMenuOption2(int id_admin, CLIENT *clnt)
+{
+	//Override the previous file stored in the field NomFichero
+	//inside the server.
+}
+
+bool_t is_empty(char *string)
+{
+	if(strlen(string) == 0)
+	{
+		return TRUE;
+	}
+
+	return FALSE;
+}
+
+bool_t is_blank(char *string)
+{
+	if(is_empty(string) == TRUE)
+	{
+		return TRUE;
+	}
+
+	int length = strlen(string);
+	
+	bool_t is_blank = TRUE;
+
+	for (int i = 0; i < length; i++)
+	{
+		if(!isspace(string[i]))
+		{
+			is_blank = FALSE;
+			break;
+		}
+	}
+	
+	return is_blank;
+}
+
+BookValidationResult validateBook(TLibro book)
+{
+	BookValidationResult book_validation_result;
+
+	if(is_empty(book.Isbn) || is_blank(book.Isbn))
+	{
+		book_validation_result.validation_result = FALSE;
+		strcpy(book_validation_result.error, "No se ha introducido ISBN");
+		return book_validation_result;
+	}
+
+	if(is_empty(book.Titulo) || is_blank(book.Titulo))
+	{
+		book_validation_result.validation_result = FALSE;
+		strcpy(book_validation_result.error, "El titulo del libro no es válido");
+		return book_validation_result;
+	}
+
+	if(is_empty(book.Autor) || is_blank(book.Autor))
+	{
+		book_validation_result.validation_result = FALSE;
+		strcpy(book_validation_result.error, "El autor introducido no es válido");
+		return book_validation_result;
+	}
+
+	if(book.Anio < 0)
+	{
+		book_validation_result.validation_result = FALSE;
+		strcpy(book_validation_result.error, "El año introducido no es válido");
+		return book_validation_result;
+	}
+
+	if(is_empty(book.Pais) || is_blank(book.Pais))
+	{
+		book_validation_result.validation_result = FALSE;
+		strcpy(book_validation_result.error, "El país introducido no es válido");
+		return book_validation_result;
+	}
+
+	if(is_empty(book.Idioma) || is_blank(book.Idioma))
+	{
+		book_validation_result.validation_result = FALSE;
+		strcpy(book_validation_result.error, "El idioma introducido no es válido");
+		return book_validation_result;
+	}
+
+	//At least one book must be available
+	if(book.NoLibros <= 0)
+	{
+		book_validation_result.validation_result = FALSE;
+		strcpy(book_validation_result.error, "El nº de libros introducido no es válido");
+		return book_validation_result;
+	}
+
+	if(book.NoPrestados < 0)
+	{
+		book_validation_result.validation_result = FALSE;
+		strcpy(book_validation_result.error, "El nº de ejemplares prestados introducido no es válido");
+		return book_validation_result;
+	}
+
+	if(book.NoListaEspera < 0)
+	{
+		book_validation_result.validation_result = FALSE;
+		strcpy(book_validation_result.error, "El nº de ejemplares en lista de espera introducido no es válido");
+		return book_validation_result;
+	}
+
+	book_validation_result.validation_result = TRUE;
+	strcpy(book_validation_result.error, "");
+
+	return book_validation_result;
+}
+
+void handleAdminMenuOption3(int id_admin, CLIENT *clnt)
+{
+	Cls;
+
+	Cadena isbn;
+	Cadena author;
+	Cadena title;
+	int year;
+	Cadena country;
+	Cadena language;
+	int number_of_books;
+
+	printf("Introduce el Isbn: ");
+	__fpurge(stdin);
+	scanf("%s", isbn);
+
+	printf("Introduce el Autor: ");
+	__fpurge(stdin);
+	scanf("%s", author);
+
+	printf("Introduce el Título: ");
+	__fpurge(stdin);
+	scanf("%s", title);
+
+	printf("Introduce el año: ");
+	__fpurge(stdin);
+	scanf("%d", &year);
+
+	printf("Introduce el País: ");
+	__fpurge(stdin);
+	scanf("%s", country);
+
+	printf("Introduce el Idioma: ");
+	__fpurge(stdin);
+	scanf("%s", language);
+
+	printf("Introduce el Número de Libros Inicial: ");
+	__fpurge(stdin);
+	scanf("%d", &number_of_books);
+
+	TLibro book;
+	
+	strcpy(book.Isbn, isbn);
+	strcpy(book.Autor, author);
+	strcpy(book.Titulo, title);
+	book.Anio = year;
+	strcpy(book.Pais, country);
+	strcpy(book.Idioma, language);
+	book.NoLibros = number_of_books;
+	book.NoPrestados = 0;
+	book.NoListaEspera = 0;
+
+	BookValidationResult book_validation_result = validateBook(book);
+
+	//FALSE means that there has been an error
+	if(book_validation_result.validation_result == FALSE)
+	{
+		printf("ISBN: %s\n", book.Isbn);
+		printf("Autor: %s\n", book.Autor);
+		printf("Titulo: %s\n", book.Titulo);
+		printf("Anio: %d\n", book.Anio);
+		printf("Pais: %s\n", book.Pais);
+		printf("Idioma: %s\n", book.Idioma);
+		printf("N libros: %d\n", book.NoLibros);
+
+		printf("Error: %s\n", book_validation_result.error);
+		Pause;
+		return;
+	}
+
+	TNuevo new_book;
+	
+	new_book.Ida = id_admin;
+	new_book.Libro = book;
+
+	int *result = nuevolibro_1(&new_book, clnt);
+
+	if (result == (int *)NULL)
+	{
+		clnt_perror(clnt, "La llamada ha fallado");
+		Pause;
+	}
+
+	if(*result == -1)
+	{
+		printf("Error: ya hay un usuario identificado como administrador o el Ida no coincide con el almacenado en el servidor\n");
+		Pause;
+	}
+	else if(*result == 0)
+	{
+		printf("Error: Hay un libro en el vector dinámico que tiene el mismo Isbn\n");
+		Pause;
+	}
+	else if(*result == 1)
+	{
+		printf("Se ha añadido el nuevo libro con éxito\n");
+		Pause;
+	}
+	else if(*result == -2)
+	{
+		printf("Error: No hay ninguna biblioteca cargada\n");
+		Pause;
+	}
+}
+
 void handleAdminMenuOption8(int id_admin, CLIENT *clnt)
 {
 	Cls;
@@ -378,6 +603,10 @@ void handleMainMenuOption1(CLIENT *clnt)
 			else if(option == 1)
 			{
 				handleAdminMenuOption1(id_admin, clnt);
+			}
+			else if(option == 3)
+			{
+				handleAdminMenuOption3(id_admin, clnt);
 			}
 			else if(option == 8)
 			{

@@ -101,6 +101,19 @@ void quick_sort(TLibro *library, int low, int high, int sorting_field)
 	}
 }
 
+bool_t contains(TLibro *library, TLibro book)
+{
+	for (int i = 0; i < NumLibros; i++)
+	{
+		if(strcmp(Biblioteca[i].Isbn, book.Isbn) == 0)
+		{
+			return TRUE;
+		}	
+	}
+
+	return FALSE;
+}
+
 int *
 conexion_1_svc(char *argp, struct svc_req *rqstp)
 {
@@ -235,13 +248,46 @@ nuevolibro_1_svc(TNuevo *argp, struct svc_req *rqstp)
 {
 	static int  result;
 
+	if(Biblioteca == NULL)
+	{
+		result = -2;
+		return &result;
+	}
+
 	if(argp->Ida != IdAdmin || argp->Ida < 0)
 	{
 		result = -1;
 		return &result;
 	}
 
+	bool_t library_already_contains_book = contains(Biblioteca, argp->Libro);
 
+	if(library_already_contains_book == TRUE)
+	{
+		result = 0;
+		return &result;
+	}
+
+	//Check if library has enough space for the new book
+	if(NumLibros == Tama)
+	{
+		Biblioteca = increment_library_size(Biblioteca, Tama, 4);
+
+		if(Biblioteca == NULL)
+		{
+			result = -2;
+			return &result;
+		}
+
+		Tama = Tama + 4;
+	}
+
+	Biblioteca[NumLibros] = argp->Libro;
+	NumLibros++;
+
+	quick_sort(Biblioteca, 0, Tama -1, CampoOrdenacion);
+
+	result = 1;
 
 	return &result;
 }
