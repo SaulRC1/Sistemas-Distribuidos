@@ -236,9 +236,63 @@ guardardatos_1_svc(int *argp, struct svc_req *rqstp)
 {
 	static bool_t  result;
 
-	/*
-	 * insert server code here
-	 */
+	if(*argp != IdAdmin || *argp < 0)
+	{
+		result = FALSE;
+		return &result;
+	}
+
+	if(Biblioteca == NULL)
+	{
+		result = FALSE;
+		return &result;
+	}
+
+	if(NumLibros == 0)
+	{
+		result = FALSE;
+		return &result;
+	}
+
+	if(strcmp(NomFichero, "") == 0)
+	{
+		result = FALSE;
+		return &result;
+	}
+
+	FILE *library_file = fopen(NomFichero, "wb");
+
+	if(library_file == NULL)
+	{
+		result = FALSE;
+		return &result;
+	}
+
+	size_t write_number_of_books_result = 
+	fwrite(&NumLibros, sizeof(int), 1, library_file);
+
+	//If write result is less than the count of elements to be written
+	//then an error has occurred.
+	if(write_number_of_books_result < 1)
+	{
+		result = FALSE;
+		fclose(library_file);
+		return &result;
+	}
+
+	size_t write_books_result = 
+	fwrite(Biblioteca, sizeof(TLibro), NumLibros, library_file);
+
+	if(write_books_result < NumLibros)
+	{
+		result = FALSE;
+		fclose(library_file);
+		return &result;
+	}
+
+	result = TRUE;	
+
+	fclose(library_file);
 
 	return &result;
 }

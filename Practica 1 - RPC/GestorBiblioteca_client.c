@@ -231,7 +231,8 @@ void handleAdminMenuOption0(int id_admin, CLIENT *clnt)
 
 	if (disconnection_result == (bool_t *)NULL)
 	{
-		clnt_perror(clnt, "La llamada a la función ha fallado");
+		clnt_perror(clnt, "La llamada a la función ha fallado\n");
+		Pause;
 		return;
 	}
 
@@ -267,7 +268,8 @@ void handleAdminMenuOption1(int id_admin, CLIENT *clnt)
 
 	if (result == (int *)NULL)
 	{
-		clnt_perror(clnt, "La llamada a la función ha fallado");
+		clnt_perror(clnt, "La llamada a la función ha fallado\n");
+		Pause;
 		return;
 	}
 
@@ -284,15 +286,51 @@ void handleAdminMenuOption1(int id_admin, CLIENT *clnt)
 	}
 	else if(*result == 1)
 	{
-		printf("Datos de la biblioteca cargados correctamente\n");
+		printf("** La biblioteca ha sido cargada **\n");
 		Pause;
 	}
 }
 
 void handleAdminMenuOption2(int id_admin, CLIENT *clnt)
 {
-	//Override the previous file stored in the field NomFichero
-	//inside the server.
+	Cls;
+
+	int *number_of_books = nlibros_1(&id_admin, clnt);
+
+	if (number_of_books == (int *)NULL)
+	{
+		clnt_perror(clnt, "La llamada a la función ha fallado\n");
+		Pause;
+		return;
+	}
+
+	if(*number_of_books == 0)
+	{
+		printf("Error: No hay libros cargados en la biblioteca. " \
+		"No se han guardado los datos.\n");
+		Pause;
+		return;
+	}
+
+	bool_t *result = guardardatos_1(&id_admin, clnt);
+
+	if (result == (bool_t *)NULL)
+	{
+		clnt_perror(clnt, "La llamada a la función ha fallado\n");
+		Pause;
+		return;
+	}
+
+	if(*result == FALSE)
+	{
+		printf("Error: No se han podido guardar los datos de la biblioteca\n");
+		Pause;
+	}
+	else
+	{
+		printf("** Se ha guardado el estado actual de la biblioteca **\n");
+		Pause;
+	}
 }
 
 bool_t is_empty(char *string)
@@ -481,8 +519,9 @@ void handleAdminMenuOption3(int id_admin, CLIENT *clnt)
 
 	if (result == (int *)NULL)
 	{
-		clnt_perror(clnt, "La llamada ha fallado");
+		clnt_perror(clnt, "La llamada a la función ha fallado\n");
 		Pause;
+		return;
 	}
 
 	if(*result == -1)
@@ -515,7 +554,8 @@ void handleAdminMenuOption8(int id_admin, CLIENT *clnt)
 
 	if (number_of_books == (int *)NULL)
 	{
-		clnt_perror(clnt, "La llamada a la función ha fallado");
+		clnt_perror(clnt, "La llamada a la función ha fallado\n");
+		Pause;
 		return;
 	}
 
@@ -539,7 +579,8 @@ void handleAdminMenuOption8(int id_admin, CLIENT *clnt)
 
 		if (book == (TLibro *)NULL)
 		{
-			clnt_perror(clnt, "La llamada a la función ha fallado");
+			clnt_perror(clnt, "La llamada a la función ha fallado\n");
+			Pause;
 			return;
 		}
 
@@ -570,7 +611,8 @@ void handleMainMenuOption1(CLIENT *clnt)
 
 	if (connection_result == (int *)NULL)
 	{
-		clnt_perror(clnt, "La llamada a la función ha fallado");
+		clnt_perror(clnt, "La llamada a la función ha fallado\n");
+		Pause;
 		return;
 	}
 
@@ -603,6 +645,10 @@ void handleMainMenuOption1(CLIENT *clnt)
 			else if(option == 1)
 			{
 				handleAdminMenuOption1(id_admin, clnt);
+			}
+			else if(option == 2)
+			{
+				handleAdminMenuOption2(id_admin, clnt);
 			}
 			else if(option == 3)
 			{
