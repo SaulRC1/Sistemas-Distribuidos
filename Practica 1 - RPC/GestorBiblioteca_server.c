@@ -400,10 +400,42 @@ retirar_1_svc(TComRet *argp, struct svc_req *rqstp)
 {
 	static int  result;
 
-	/*
-	 * insert server code here
-	 */
+	if(argp->Ida != IdAdmin || argp->Ida < 0)
+	{
+		result = -1;
+		return &result;
+	}
 
+	if(Biblioteca == NULL || NumLibros == 0)
+	{
+		result = 0;
+		return &result;
+	}
+
+	TConsulta search_book;
+	search_book.Ida = argp->Ida;
+	strcpy(search_book.Datos, argp->Isbn);
+
+	int *book_position = buscar_1_svc(&search_book, rqstp);
+
+	if(*book_position == -1)
+	{
+		result = 0;
+		return &result;
+	}
+
+	if(Biblioteca[*book_position].NoLibros >= argp->NoLibros)
+	{
+		Biblioteca[*book_position].NoLibros -= argp->NoLibros;
+		result = 1;
+	}
+	else
+	{
+		result = 2;
+	}
+	
+	quick_sort(Biblioteca, 0, Tama - 1, CampoOrdenacion);
+	
 	return &result;
 }
 

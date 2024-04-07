@@ -688,6 +688,153 @@ void handleAdminMenuOption4(int id_admin, CLIENT *clnt)
 
 }
 
+void handleAdminMenuOption5(int id_admin, CLIENT *clnt)
+{
+	Cls;
+
+	int *number_of_books = nlibros_1(&id_admin, clnt);
+
+	if (number_of_books == (int *)NULL)
+	{
+		clnt_perror(clnt, "La llamada a la función ha fallado\n");
+		Pause;
+		return;
+	}
+
+	if(*number_of_books == 0)
+	{
+		printf("No hay libros cargados en la biblioteca.\n");
+		Pause;
+		return;
+	}
+
+	Cadena isbn;
+
+	printf("Introduce ISBN a buscar: ");
+	__fpurge(stdin);
+	scanf("%s", isbn);
+
+	TConsulta search_book;
+	strcpy(search_book.Datos, isbn);
+	search_book.Ida = id_admin;
+
+	int *book_position = buscar_1(&search_book, clnt);
+
+	if (book_position == (int *)NULL)
+	{
+		clnt_perror(clnt, "La llamada a la función ha fallado\n");
+		Pause;
+		return;
+	}
+
+	if(*book_position == -1)
+	{
+		printf("Error: No se ha encontrado ningún libro con el ISBN indicado.\n");
+		Pause;
+		return;
+	}
+
+	if(*book_position == -2)
+	{
+		printf("Error: Ya hay un usuario identificado como administrador." \
+		" O bien el ID no coincide con el almacenado en el servidor\n");
+		Pause;
+		return;
+	}
+
+	if(*book_position == -3)
+	{
+		printf("Error: No hay biblioteca cargada actualmente.\n");
+		Pause;
+		return;
+	}
+
+	TPosicion book_position_struct;
+	book_position_struct.Ida = id_admin;
+	book_position_struct.Pos = *book_position;
+
+	TLibro *book = descargar_1(&book_position_struct, clnt);
+
+	if (book == (TLibro *)NULL)
+	{
+		clnt_perror(clnt, "La llamada a la función ha fallado\n");
+		Pause;
+		return;
+	}
+
+	MostrarLibro(book, *book_position, TRUE);
+
+	char discard_books_or_not;
+
+	printf("¿Es este el libro del que deseas retirar unidades? (s/n): ");
+	__fpurge(stdin);
+	scanf("%c", &discard_books_or_not);
+
+	if(discard_books_or_not == 's' || discard_books_or_not == 'S')
+	{
+		int books_discarded;
+
+		do
+		{
+			printf("Introduce número de unidades a retirar: ");
+			__fpurge(stdin);
+			scanf("%d", &books_discarded);
+
+			if(books_discarded <= 0)
+			{
+				printf("El número de libros retirados debe ser mayor que 0\n");
+			}
+
+		} while (books_discarded <= 0);
+		
+		TComRet discard_book;
+		discard_book.Ida = id_admin;
+		strcpy(discard_book.Isbn, isbn);
+		discard_book.NoLibros = books_discarded;
+
+		int *discard_result = retirar_1(&discard_book, clnt);
+
+		if (discard_result == (int *)NULL)
+		{
+			clnt_perror(clnt, "La llamada a la función ha fallado\n");
+			Pause;
+			return;
+		}
+
+		if(*discard_result == -1)
+		{
+			printf("Error: Ya hay un usuario identificado como administrador." \
+			" O bien el ID no coincide con el almacenado en el servidor\n");
+			Pause;
+			return;
+		} 
+		else if(*discard_result == 0)
+		{
+			printf("Error: No hay un libro en la biblioteca que contenga el mismo ISBN\n");
+			Pause;
+			return;
+		}
+		else if(*discard_result == 1)
+		{
+			printf("** Se han retirado el numero de libros indicados **\n");
+			Pause;
+			return;
+		}
+		else if(*discard_result == 2)
+		{
+			printf("Error: no hay suficientes ejemplares disponibles para ser retirados\n");
+			Pause;
+			return;
+		}
+	}
+	else
+	{
+		printf("** Operación de retirar libros abortada **\n");
+		Pause;
+		return;
+	}
+}
+
 void handleAdminMenuOption8(int id_admin, CLIENT *clnt)
 {
 	Cls;
@@ -799,6 +946,10 @@ void handleMainMenuOption1(CLIENT *clnt)
 			else if(option == 4)
 			{
 				handleAdminMenuOption4(id_admin, clnt);
+			}
+			else if(option == 5)
+			{
+				handleAdminMenuOption5(id_admin, clnt);
 			}
 			else if(option == 8)
 			{
