@@ -385,6 +385,7 @@ comprar_1_svc(TComRet *argp, struct svc_req *rqstp)
 	else
 	{
 		Biblioteca[*book_position].NoListaEspera -= Biblioteca[*book_position].NoLibros;
+		Biblioteca[*book_position].NoLibros = 0;
 	}
 
 	quick_sort(Biblioteca, 0, Tama - 1, CampoOrdenacion);
