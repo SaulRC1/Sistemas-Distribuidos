@@ -546,6 +546,148 @@ void handleAdminMenuOption3(int id_admin, CLIENT *clnt)
 	}
 }
 
+void handleAdminMenuOption4(int id_admin, CLIENT *clnt)
+{
+	Cls;
+
+	int *number_of_books = nlibros_1(&id_admin, clnt);
+
+	if (number_of_books == (int *)NULL)
+	{
+		clnt_perror(clnt, "La llamada a la función ha fallado\n");
+		Pause;
+		return;
+	}
+
+	if(*number_of_books == 0)
+	{
+		printf("No hay libros cargados en la biblioteca.\n");
+		Pause;
+		return;
+	}
+
+	Cadena isbn;
+
+	printf("Introduce ISBN a buscar: ");
+	__fpurge(stdin);
+	scanf("%s", isbn);
+
+	TConsulta search_book;
+	strcpy(search_book.Datos, isbn);
+	search_book.Ida = id_admin;
+
+	int *book_position = buscar_1(&search_book, clnt);
+
+	if (book_position == (int *)NULL)
+	{
+		clnt_perror(clnt, "La llamada a la función ha fallado\n");
+		Pause;
+		return;
+	}
+
+	if(*book_position == -1)
+	{
+		printf("Error: No se ha encontrado ningún libro con el ISBN indicado.\n");
+		Pause;
+		return;
+	}
+
+	if(*book_position == -2)
+	{
+		printf("Error: Ya hay un usuario identificado como administrador." \
+		" O bien el ID no coincide con el almacenado en el servidor\n");
+		Pause;
+		return;
+	}
+
+	if(*book_position == -3)
+	{
+		printf("Error: No hay biblioteca cargada actualmente.\n");
+		Pause;
+		return;
+	}
+
+	TPosicion book_position_struct;
+	book_position_struct.Ida = id_admin;
+	book_position_struct.Pos = *book_position;
+
+	TLibro *book = descargar_1(&book_position_struct, clnt);
+
+	if (book == (TLibro *)NULL)
+	{
+		clnt_perror(clnt, "La llamada a la función ha fallado\n");
+		Pause;
+		return;
+	}
+
+	MostrarLibro(book, *book_position, TRUE);
+
+	char buy_books_or_not;
+
+	printf("¿Es este el libro del que deseas comprar más unidades? (s/n): ");
+	__fpurge(stdin);
+	scanf("%c", &buy_books_or_not);
+
+	if(buy_books_or_not == 's' || buy_books_or_not == 'S')
+	{
+		int books_bought;
+
+		do
+		{
+			printf("Introduce número de libros comprados: ");
+			__fpurge(stdin);
+			scanf("%d", &books_bought);
+
+			if(books_bought <= 0)
+			{
+				printf("El número de libros comprados debe ser mayor que 0\n");
+			}
+
+		} while (books_bought <= 0);
+		
+		TComRet buy_book;
+		buy_book.Ida = id_admin;
+		strcpy(buy_book.Isbn, isbn);
+		buy_book.NoLibros = books_bought;
+
+		int *buy_result = comprar_1(&buy_book, clnt);
+
+		if (buy_result == (int *)NULL)
+		{
+			clnt_perror(clnt, "La llamada a la función ha fallado\n");
+			Pause;
+			return;
+		}
+
+		if(*buy_result == -1)
+		{
+			printf("Error: Ya hay un usuario identificado como administrador." \
+			" O bien el ID no coincide con el almacenado en el servidor\n");
+			Pause;
+			return;
+		} 
+		else if(*buy_result == 0)
+		{
+			printf("Error: No hay un libro en la biblioteca que contenga el mismo ISBN\n");
+			Pause;
+			return;
+		}
+		else if(*buy_result == 1)
+		{
+			printf("** Se han añadido los nuevos libros **\n");
+			Pause;
+			return;
+		}
+	}
+	else
+	{
+		printf("** Operación de compra abortada **\n");
+		Pause;
+		return;
+	}
+
+}
+
 void handleAdminMenuOption8(int id_admin, CLIENT *clnt)
 {
 	Cls;
@@ -653,6 +795,10 @@ void handleMainMenuOption1(CLIENT *clnt)
 			else if(option == 3)
 			{
 				handleAdminMenuOption3(id_admin, clnt);
+			}
+			else if(option == 4)
+			{
+				handleAdminMenuOption4(id_admin, clnt);
 			}
 			else if(option == 8)
 			{

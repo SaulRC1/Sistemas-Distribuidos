@@ -351,9 +351,45 @@ comprar_1_svc(TComRet *argp, struct svc_req *rqstp)
 {
 	static int  result;
 
-	/*
-	 * insert server code here
-	 */
+	if(argp->Ida != IdAdmin || argp->Ida < 0)
+	{
+		result = -1;
+		return &result;
+	}
+
+	if(Biblioteca == NULL || NumLibros == 0)
+	{
+		result = 0;
+		return &result;
+	}
+
+	TConsulta search_book;
+	search_book.Ida = argp->Ida;
+	strcpy(search_book.Datos, argp->Isbn);
+
+	int *book_position = buscar_1_svc(&search_book, rqstp);
+
+	if(*book_position == -1)
+	{
+		result = 0;
+		return &result;
+	}
+
+	Biblioteca[*book_position].NoLibros += argp->NoLibros;
+
+	if(Biblioteca[*book_position].NoLibros >= Biblioteca[*book_position].NoListaEspera)
+	{
+		Biblioteca[*book_position].NoLibros -= Biblioteca[*book_position].NoListaEspera;
+		Biblioteca[*book_position].NoListaEspera = 0;
+	}
+	else
+	{
+		Biblioteca[*book_position].NoListaEspera -= Biblioteca[*book_position].NoLibros;
+	}
+
+	quick_sort(Biblioteca, 0, Tama - 1, CampoOrdenacion);
+
+	result = 1;
 
 	return &result;
 }
@@ -411,9 +447,29 @@ buscar_1_svc(TConsulta *argp, struct svc_req *rqstp)
 {
 	static int  result;
 
-	/*
-	 * insert server code here
-	 */
+	if(argp->Ida != IdAdmin || argp->Ida < 0)
+	{
+		result = -2;
+		return &result;
+	}
+
+	if(Biblioteca == NULL || NumLibros == 0)
+	{
+		result = -3;
+		return &result;
+	}
+
+	//by default the book is not found
+	result = -1;
+	
+	for (int i = 0; i < NumLibros; i++)
+	{
+		if(strcmp(Biblioteca[i].Isbn, argp->Datos) == 0)
+		{
+			result = i;
+			break;		
+		}
+	}
 
 	return &result;
 }
