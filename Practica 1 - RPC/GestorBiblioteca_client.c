@@ -835,6 +835,78 @@ void handleAdminMenuOption5(int id_admin, CLIENT *clnt)
 	}
 }
 
+void handleAdminMenuOption6(int id_admin, CLIENT *clnt)
+{
+	Cls;
+
+	int *number_of_books = nlibros_1(&id_admin, clnt);
+
+	if (number_of_books == (int *)NULL)
+	{
+		clnt_perror(clnt, "La llamada a la función ha fallado\n");
+		Pause;
+		return;
+	}
+
+	if(*number_of_books == 0)
+	{
+		printf("Error: No hay libros cargados en la biblioteca.\n");
+		Pause;
+		return;
+	}
+
+	printf("Código de ordenación\n");
+	printf("0.- Por ISBN\n");
+	printf("1.- Por Título\n");
+	printf("2.- Por Autor\n");
+	printf("3.- Por Año\n");
+	printf("4.- Por País\n");
+	printf("5.- Por Idioma\n");
+	printf("6.- Por nº de libros disponibles\n");
+	printf("7.- Por nº de libros prestados\n");
+	printf("8.- Por nº de libros en espera\n");
+
+	int sorting_field;
+
+	do
+	{
+		printf("Introduce código: ");
+		__fpurge(stdin);
+		scanf("%d", &sorting_field);
+
+		if(sorting_field < 0 || sorting_field > 8)
+		{
+			printf("Error: el código introducido no es válido.\n");
+		}
+
+	} while (sorting_field < 0 || sorting_field > 8);
+
+	TOrdenacion sorting_data;
+	sorting_data.Campo = sorting_field;
+	sorting_data.Ida = id_admin;
+	
+	bool_t *sorting_result = ordenar_1(&sorting_data, clnt);
+
+	if (sorting_result == (bool_t *)NULL)
+	{
+		clnt_perror(clnt, "La llamada a la función ha fallado\n");
+		Pause;
+		return;
+	}
+
+	if(*sorting_result == TRUE)
+	{
+		printf("** La biblioteca ha sido ordenada correctamente **\n");
+		Pause;
+	}
+	else
+	{
+		printf("Error: Ya hay un usuario identificado como administrador." \
+			" O bien el ID no coincide con el almacenado en el servidor\n");
+		Pause;
+	}
+}
+
 void handleAdminMenuOption8(int id_admin, CLIENT *clnt)
 {
 	Cls;
@@ -950,6 +1022,10 @@ void handleMainMenuOption1(CLIENT *clnt)
 			else if(option == 5)
 			{
 				handleAdminMenuOption5(id_admin, clnt);
+			}
+			else if(option == 6)
+			{
+				handleAdminMenuOption6(id_admin, clnt);
 			}
 			else if(option == 8)
 			{

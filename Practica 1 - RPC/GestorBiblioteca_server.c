@@ -435,7 +435,7 @@ retirar_1_svc(TComRet *argp, struct svc_req *rqstp)
 	}
 	
 	quick_sort(Biblioteca, 0, Tama - 1, CampoOrdenacion);
-	
+
 	return &result;
 }
 
@@ -455,6 +455,8 @@ ordenar_1_svc(TOrdenacion *argp, struct svc_req *rqstp)
 		result = FALSE;
 		return &result;
 	}
+
+	result = FALSE;
 
 	quick_sort(Biblioteca, 0, Tama - 1, argp->Campo);
 
