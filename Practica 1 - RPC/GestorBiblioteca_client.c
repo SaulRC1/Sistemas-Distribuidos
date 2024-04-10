@@ -225,6 +225,186 @@ void MostrarLibro(TLibro *L, int Pos, bool_t Cabecera)
 	printf("     %s%s%-*d\n", A, PI, 12, L->Anio);
 }
 
+char * underline_string(char *source_string, char *substring)
+{
+	printf("Source string: %s\n", source_string);
+	printf("Substring: %s\n", substring);
+
+	//strlen does not count the terminating \0 character.
+	int source_string_length = strlen(source_string) + 1;
+
+	//starting underline string (\033[4m) is 7 characters long, and 
+	//the end underline string (\033[24m) is 8 characters long, for a total
+	//of 15 characters.
+	int underlined_string_length = source_string_length + 15;
+
+	char *underlined_string = malloc(source_string_length * sizeof(char));
+
+	strcpy(underlined_string, source_string);
+
+	printf("Underlined string #1: %s\n", underlined_string);
+	
+	char *occurrence_substring = strstr(underlined_string, substring);
+
+	if(occurrence_substring != NULL)
+	{
+		printf("Occurrence substring: %s\n", occurrence_substring);
+		char *underlined_substring = 
+		malloc((strlen(occurrence_substring) + 1 + 15) * sizeof(char));
+
+		char *occurrence_substring_copy = 
+		malloc((strlen(occurrence_substring) + 1) * sizeof(char));
+
+		strcpy(occurrence_substring_copy, occurrence_substring);
+
+		strcpy(underlined_substring, "\033[4m");
+		strcat(underlined_substring, occurrence_substring_copy);
+		strcat(underlined_substring, "\033[24m");
+
+		printf("Underlined substring: %s\n", underlined_substring);
+
+		strcpy(occurrence_substring, underlined_substring);
+
+		printf("Underlined string: %s\n", underlined_string);
+
+		return underlined_string;
+	}
+
+	return NULL;
+}
+
+void search_book(Cadena search_text, char search_code, TLibro *book, 
+int book_position, bool_t *first_book)
+{
+	if (search_code == 'I' || search_code == 'i')
+	{
+		char *result = strstr(book->Isbn, search_text);
+
+		if(result != NULL)
+		{
+			//underline_string(book->Isbn, search_text);
+
+			MostrarLibro(book, book_position, *first_book);
+
+			*first_book = FALSE;
+		}
+	}
+	else if(search_code == 'T' || search_code == 't')
+	{
+		char *result = strstr(book->Titulo, search_text);
+
+		if(result != NULL)
+		{
+			//underline_string(book->Isbn, search_text);
+
+			MostrarLibro(book, book_position, *first_book);
+
+			*first_book = FALSE;
+		}
+	}
+	else if(search_code == 'T' || search_code == 't')
+	{
+		char *result = strstr(book->Titulo, search_text);
+
+		if(result != NULL)
+		{
+			//underline_string(book->Isbn, search_text);
+
+			MostrarLibro(book, book_position, *first_book);
+
+			*first_book = FALSE;
+		}
+	}
+	else if(search_code == 'A' || search_code == 'a')
+	{
+		char *result = strstr(book->Autor, search_text);
+
+		if(result != NULL)
+		{
+			//underline_string(book->Isbn, search_text);
+
+			MostrarLibro(book, book_position, *first_book);
+
+			*first_book = FALSE;
+		}
+	}
+	else if(search_code == 'P' || search_code == 'p')
+	{
+		char *result = strstr(book->Pais, search_text);
+
+		if(result != NULL)
+		{
+			//underline_string(book->Isbn, search_text);
+
+			MostrarLibro(book, book_position, *first_book);
+
+			*first_book = FALSE;
+		}
+	}
+	else if(search_code == 'D' || search_code == 'd')
+	{
+		char *result = strstr(book->Idioma, search_text);
+
+		if(result != NULL)
+		{
+			//underline_string(book->Isbn, search_text);
+
+			MostrarLibro(book, book_position, *first_book);
+
+			*first_book = FALSE;
+		}
+	}
+	else if(search_code == '*')
+	{
+		char *result_I = strstr(book->Isbn, search_text);
+		char *result_T = strstr(book->Titulo, search_text);
+		char *result_A = strstr(book->Autor, search_text);
+		char *result_P = strstr(book->Pais, search_text);
+		char *result_D = strstr(book->Idioma, search_text);
+
+		if(result_I != NULL || result_T != NULL || result_A != NULL
+		|| result_P != NULL || result_D != NULL)
+		{
+			//underline_string(book->Isbn, search_text);
+
+			MostrarLibro(book, book_position, *first_book);
+
+			*first_book = FALSE;
+		}
+	}
+}
+
+void search_library(Cadena search_text, char search_code, 
+int number_of_books, int id_admin, CLIENT *clnt)
+{
+	bool_t first_book = TRUE;
+
+	for (int i = 0; i < number_of_books; i++)
+	{
+		TPosicion book_position_struct;
+		book_position_struct.Ida = id_admin;
+		book_position_struct.Pos = i;
+
+		TLibro *book = descargar_1(&book_position_struct, clnt);
+
+		if (book == (TLibro *)NULL)
+		{
+			clnt_perror(clnt, "La llamada a la función ha fallado\n");
+			Pause;
+			return;
+		}
+
+		search_book(search_text, search_code, book, i, &first_book);
+	}
+
+	if(first_book == TRUE)
+	{
+		printf("Error: no se ha encontrado ningún libro. \n");
+	}
+	
+	Pause;
+}
+
 void handleAdminMenuOption0(int id_admin, CLIENT *clnt)
 {
 	bool_t *disconnection_result = desconexion_1(&id_admin, clnt);
@@ -907,6 +1087,59 @@ void handleAdminMenuOption6(int id_admin, CLIENT *clnt)
 	}
 }
 
+void handleAdminMenuOption7(int id_admin, CLIENT *clnt)
+{
+	Cls;
+
+	int *number_of_books = nlibros_1(&id_admin, clnt);
+
+	if (number_of_books == (int *)NULL)
+	{
+		clnt_perror(clnt, "La llamada a la función ha fallado\n");
+		Pause;
+		return;
+	}
+
+	if(*number_of_books == 0)
+	{
+		printf("Error: No hay libros cargados en la biblioteca.\n");
+		Pause;
+		return;
+	}
+
+	Cadena search_text;
+
+	printf("Introduce el texto a buscar: ");
+	__fpurge(stdin);
+	scanf("%s", search_text);
+
+	printf("Código de búsqueda\n");
+	printf("I.- Por ISBN\n");
+	printf("T.- Por Título\n");
+	printf("A.- Por Autor\n");
+	printf("P.- Por País\n");
+	printf("D.- Por Idioma\n");
+	printf("*.- Por todos los campos\n");
+	
+	char search_code;
+
+	do
+	{
+		printf("Introduce código: ");
+		__fpurge(stdin);
+		scanf("%c", &search_code);
+
+		if (search_code != 'I' && search_code != 'T' && search_code != 'A' 
+		&& search_code != 'P' && search_code != 'D' && search_code != '*')
+		{
+			printf("Error: el código introducido no es válido\n");
+		}
+	} while (search_code != 'I' && search_code != 'T' && search_code != 'A'
+	&& search_code != 'P' && search_code != 'D' && search_code != '*');
+	
+	search_library(search_text, search_code, *number_of_books, id_admin, clnt);
+}
+
 void handleAdminMenuOption8(int id_admin, CLIENT *clnt)
 {
 	Cls;
@@ -1026,6 +1259,10 @@ void handleMainMenuOption1(CLIENT *clnt)
 			else if(option == 6)
 			{
 				handleAdminMenuOption6(id_admin, clnt);
+			}
+			else if(option == 7)
+			{
+				handleAdminMenuOption7(id_admin, clnt);
 			}
 			else if(option == 8)
 			{
