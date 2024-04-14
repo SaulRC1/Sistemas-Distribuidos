@@ -593,7 +593,39 @@ devolver_1_svc(TPosicion *argp, struct svc_req *rqstp)
 {
 	static int  result;
 
-	
+	if(argp->Pos < 0 || argp->Pos >= NumLibros)
+	{
+		result = -1;
+		return &result;
+	}
+
+	if(Biblioteca == NULL || NumLibros == 0)
+	{
+		result = -2;
+		return &result;
+	}
+
+	TLibro book = Biblioteca[argp->Pos];
+
+	if(book.NoListaEspera > 0)
+	{
+		book.NoListaEspera--;
+		result = 0;
+	}
+	else if(book.NoListaEspera == 0 && book.NoPrestados > 0)
+	{
+		book.NoPrestados--;
+		book.NoLibros++;
+		result = 1;
+	}
+	else
+	{
+		result = 2;
+	}
+
+	Biblioteca[argp->Pos] = book;
+
+	quick_sort(Biblioteca, 0, Tama - 1, CampoOrdenacion);
 
 	return &result;
 }

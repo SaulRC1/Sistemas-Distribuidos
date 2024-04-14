@@ -1379,7 +1379,105 @@ void handleMainMenuOption3(CLIENT *clnt)
 
 void handleMainMenuOption4(CLIENT *clnt)
 {
+	int *id_admin = malloc(sizeof(int));
+	*id_admin = -1;
 
+	bool_t books_found = handleAdminMenuOption7(-1, clnt);
+
+	if(books_found == FALSE)
+	{
+		Pause;
+		return;
+	}
+
+	char return_book;
+
+	do
+	{
+		printf("¿Quieres devolver algún libro de la biblioteca? (s/n): ");
+		__fpurge(stdin);
+		scanf("%c", &return_book);
+
+		if(return_book != 's' && return_book != 'S' && return_book != 'n' 
+		&& return_book != 'N')
+		{
+			printf("Error: el carácter introducido no es válido\n");
+		}
+	} while (return_book != 's' && return_book != 'S' && return_book != 'n' 
+		&& return_book != 'N');
+
+	if(return_book == 'n' || return_book == 'N')
+	{
+		return;
+	}
+	
+	int book_position;
+
+	do
+	{
+		printf("Introduce la posición del libro a devolver: ");
+		__fpurge(stdin);
+		scanf("%d", &book_position);
+
+		if(book_position < 0)
+		{
+			printf("Error: introduzca una posición válida\n");
+		}
+	} while (book_position < 0);
+
+	TPosicion book_position_argument;
+	book_position_argument.Ida = *id_admin;
+
+	//The user sees the position incremented by 1.
+	book_position_argument.Pos = book_position - 1;
+
+	int *return_result = devolver_1(&book_position_argument, clnt);
+
+	if (return_result == (int *)NULL)
+	{
+		clnt_perror(clnt, "La llamada a la función ha fallado\n");
+		Pause;
+		return;
+	}
+
+	if(*return_result == -1)
+	{
+		printf("Error: La posición indicada no está dentro de los" \ 
+		" límites del vector dinámico.\n");
+		Pause;
+		return;
+	}
+
+	if(*return_result == -2)
+	{
+		printf("Error: La biblioteca no está cargada.\n");
+		Pause;
+		return;
+	}
+
+	if(*return_result == 1)
+	{
+		printf("** Se ha devuelto el libro y puesto en la " \
+		"estantería **\n");
+		Pause;
+		return;
+	}
+
+	if(*return_result == 0)
+	{
+		printf("** Se ha devuelto el libro y dado a una persona en " \ 
+		"lista de espera **\n");
+		Pause;
+		return;
+	}
+
+	if(*return_result == 2)
+	{
+		printf("Error: El libro no se puede devolver, porque no hay " \ 
+		"usuarios en lista de espera ni libros prestados\n");
+		Pause;
+		return;
+	}
 }
 
 int main(int argc, char *argv[])
