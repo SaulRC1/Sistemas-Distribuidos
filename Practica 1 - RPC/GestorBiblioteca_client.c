@@ -374,7 +374,8 @@ int book_position, bool_t *first_book)
 	}
 }
 
-void search_library(Cadena search_text, char search_code, 
+//Returns false if no book is found, true otherwise
+bool_t search_library(Cadena search_text, char search_code, 
 int number_of_books, int id_admin, CLIENT *clnt)
 {
 	bool_t first_book = TRUE;
@@ -391,7 +392,7 @@ int number_of_books, int id_admin, CLIENT *clnt)
 		{
 			clnt_perror(clnt, "La llamada a la función ha fallado\n");
 			Pause;
-			return;
+			return FALSE;
 		}
 
 		search_book(search_text, search_code, book, i, &first_book);
@@ -400,9 +401,10 @@ int number_of_books, int id_admin, CLIENT *clnt)
 	if(first_book == TRUE)
 	{
 		printf("Error: no se ha encontrado ningún libro. \n");
+		return FALSE;
 	}
-	
-	Pause;
+
+	return TRUE;
 }
 
 void handleAdminMenuOption0(int id_admin, CLIENT *clnt)
@@ -1087,7 +1089,7 @@ void handleAdminMenuOption6(int id_admin, CLIENT *clnt)
 	}
 }
 
-void handleAdminMenuOption7(int id_admin, CLIENT *clnt)
+bool_t handleAdminMenuOption7(int id_admin, CLIENT *clnt)
 {
 	Cls;
 
@@ -1097,14 +1099,14 @@ void handleAdminMenuOption7(int id_admin, CLIENT *clnt)
 	{
 		clnt_perror(clnt, "La llamada a la función ha fallado\n");
 		Pause;
-		return;
+		return FALSE;
 	}
 
 	if(*number_of_books == 0)
 	{
 		printf("Error: No hay libros cargados en la biblioteca.\n");
 		Pause;
-		return;
+		return FALSE;
 	}
 
 	Cadena search_text;
@@ -1137,7 +1139,7 @@ void handleAdminMenuOption7(int id_admin, CLIENT *clnt)
 	} while (search_code != 'I' && search_code != 'T' && search_code != 'A'
 	&& search_code != 'P' && search_code != 'D' && search_code != '*');
 	
-	search_library(search_text, search_code, *number_of_books, id_admin, clnt);
+	return search_library(search_text, search_code, *number_of_books, id_admin, clnt);
 }
 
 void handleAdminMenuOption8(int id_admin, CLIENT *clnt)
@@ -1263,6 +1265,7 @@ void handleMainMenuOption1(CLIENT *clnt)
 			else if(option == 7)
 			{
 				handleAdminMenuOption7(id_admin, clnt);
+				Pause;
 			}
 			else if(option == 8)
 			{
@@ -1271,6 +1274,112 @@ void handleMainMenuOption1(CLIENT *clnt)
 
 		} while (option != 0);
 	}
+}
+
+void handleMainMenuOption2(CLIENT *clnt)
+{
+	handleAdminMenuOption7(-1, clnt);
+	Pause;
+}
+
+void handleMainMenuOption3(CLIENT *clnt)
+{
+	int *id_admin = malloc(sizeof(int));
+	*id_admin = -1;
+
+	bool_t books_found = handleAdminMenuOption7(-1, clnt);
+
+	if(books_found == FALSE)
+	{
+		Pause;
+		return;
+	}
+
+	char take_book;
+
+	do
+	{
+		printf("¿Quieres sacar algún libro de la biblioteca? (s/n): ");
+		__fpurge(stdin);
+		scanf("%c", &take_book);
+
+		if(take_book != 's' && take_book != 'S' && take_book != 'n' 
+		&& take_book != 'N')
+		{
+			printf("Error: el carácter introducido no es válido\n");
+		}
+	} while (take_book != 's' && take_book != 'S' && take_book != 'n' 
+		&& take_book != 'N');
+
+	if(take_book == 'n' || take_book == 'N')
+	{
+		return;
+	}
+	
+	int book_position;
+
+	do
+	{
+		printf("Introduce la posición del libro a solicitar su préstamo: ");
+		__fpurge(stdin);
+		scanf("%d", &book_position);
+
+		if(book_position < 0)
+		{
+			printf("Error: introduzca una posición válida\n");
+		}
+	} while (book_position < 0);
+
+	TPosicion book_position_argument;
+	book_position_argument.Ida = *id_admin;
+
+	//The user sees the position incremented by 1.
+	book_position_argument.Pos = book_position - 1;
+
+	int *lend_result = prestar_1(&book_position_argument, clnt);
+
+	if (lend_result == (int *)NULL)
+	{
+		clnt_perror(clnt, "La llamada a la función ha fallado\n");
+		Pause;
+		return;
+	}
+
+	if(*lend_result == -1)
+	{
+		printf("Error: La posición indicada no está dentro de los" \ 
+		" límites del vector dinámico.\n");
+		Pause;
+		return;
+	}
+
+	if(*lend_result == -2)
+	{
+		printf("Error: La biblioteca no está cargada.\n");
+		Pause;
+		return;
+	}
+
+	if(*lend_result == 1)
+	{
+		printf("** El préstamo se ha concedido, recoge el libro" \
+		" en el mostrador. **\n");
+		Pause;
+		return;
+	}
+
+	if(*lend_result == 0)
+	{
+		printf("Error: No hay ejemplares disponibles actualmente, se" \
+		" le ha puesto en la lista de espera.\n");
+		Pause;
+		return;
+	}
+}
+
+void handleMainMenuOption4(CLIENT *clnt)
+{
+
 }
 
 int main(int argc, char *argv[])
@@ -1307,15 +1416,15 @@ int main(int argc, char *argv[])
 		}
 		else if(opcion == 2)
 		{
-
+			handleMainMenuOption2(clnt);
 		}
 		else if(opcion == 3)
 		{
-
+			handleMainMenuOption3(clnt);
 		}
 		else if(opcion == 4)
 		{
-
+			handleMainMenuOption4(clnt);
 		}
 
 	} while (opcion != 0);

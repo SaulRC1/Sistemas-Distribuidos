@@ -555,9 +555,35 @@ prestar_1_svc(TPosicion *argp, struct svc_req *rqstp)
 {
 	static int  result;
 
-	/*
-	 * insert server code here
-	 */
+	if(argp->Pos < 0 || argp->Pos >= NumLibros)
+	{
+		result = -1;
+		return &result;
+	}
+
+	if(Biblioteca == NULL || NumLibros == 0)
+	{
+		result = -2;
+		return &result;
+	}
+
+	TLibro book = Biblioteca[argp->Pos];
+
+	if(book.NoLibros > 0)
+	{
+		book.NoLibros--;
+		book.NoPrestados++;
+		result = 1;
+	}
+	else
+	{
+		book.NoListaEspera++;
+		result = 0;
+	}
+
+	Biblioteca[argp->Pos] = book;
+
+	quick_sort(Biblioteca, 0, Tama - 1, CampoOrdenacion);
 
 	return &result;
 }
@@ -567,9 +593,7 @@ devolver_1_svc(TPosicion *argp, struct svc_req *rqstp)
 {
 	static int  result;
 
-	/*
-	 * insert server code here
-	 */
+	
 
 	return &result;
 }
