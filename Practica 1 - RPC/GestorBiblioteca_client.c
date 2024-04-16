@@ -640,11 +640,11 @@ void handleAdminMenuOption3(int id_admin, CLIENT *clnt)
 
 	printf("Introduce el Autor: ");
 	__fpurge(stdin);
-	scanf("%s", author);
+	scanf("%[^\n]s", author);
 
 	printf("Introduce el Título: ");
 	__fpurge(stdin);
-	scanf("%s", title);
+	scanf("%[^\n]s", title);
 
 	printf("Introduce el año: ");
 	__fpurge(stdin);
@@ -652,7 +652,7 @@ void handleAdminMenuOption3(int id_admin, CLIENT *clnt)
 
 	printf("Introduce el País: ");
 	__fpurge(stdin);
-	scanf("%s", country);
+	scanf("%[^\n]s", country);
 
 	printf("Introduce el Idioma: ");
 	__fpurge(stdin);
@@ -1113,7 +1113,7 @@ bool_t handleAdminMenuOption7(int id_admin, CLIENT *clnt)
 
 	printf("Introduce el texto a buscar: ");
 	__fpurge(stdin);
-	scanf("%s", search_text);
+	scanf("%[^\n]s", search_text);
 
 	printf("Código de búsqueda\n");
 	printf("I.- Por ISBN\n");

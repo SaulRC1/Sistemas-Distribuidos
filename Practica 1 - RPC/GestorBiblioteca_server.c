@@ -196,37 +196,17 @@ cargardatos_1_svc(TConsulta *argp, struct svc_req *rqstp)
 		NumLibros = 0;
 	}
 
-	Biblioteca = malloc(4 * sizeof(TLibro));
-	Tama = 4;
-
 	fread(&NumLibros, sizeof(int), 1, library_file);
-	
-	int library_index = 0;
 
-	while(!feof(library_file))
-	{
-		if(library_index >= Tama)
-		{
-			Biblioteca = increment_library_size(Biblioteca, Tama, 4);
+	Biblioteca = malloc(NumLibros * sizeof(TLibro));
+	Tama = NumLibros;
 
-			if(Biblioteca == NULL)
-			{
-				result = 0;
-				return &result;
-			}
-
-			Tama = Tama + 4;
-		}
-
-		fread(&Biblioteca[library_index], sizeof(TLibro), 1, library_file);
-
-		library_index++;
-	}
+	fread(Biblioteca, sizeof(TLibro), NumLibros, library_file);
 
 	fclose(library_file);
 	result = 1;
 
-	quick_sort(Biblioteca, 0, Tama - 1, CampoOrdenacion);
+	quick_sort(Biblioteca, 0, NumLibros - 1, CampoOrdenacion);
 
 	return &result;
 }
@@ -339,7 +319,7 @@ nuevolibro_1_svc(TNuevo *argp, struct svc_req *rqstp)
 	Biblioteca[NumLibros] = argp->Libro;
 	NumLibros++;
 
-	quick_sort(Biblioteca, 0, Tama -1, CampoOrdenacion);
+	quick_sort(Biblioteca, 0, NumLibros -1, CampoOrdenacion);
 
 	result = 1;
 
@@ -388,7 +368,7 @@ comprar_1_svc(TComRet *argp, struct svc_req *rqstp)
 		Biblioteca[*book_position].NoLibros = 0;
 	}
 
-	quick_sort(Biblioteca, 0, Tama - 1, CampoOrdenacion);
+	quick_sort(Biblioteca, 0, NumLibros - 1, CampoOrdenacion);
 
 	result = 1;
 
@@ -434,7 +414,7 @@ retirar_1_svc(TComRet *argp, struct svc_req *rqstp)
 		result = 2;
 	}
 	
-	quick_sort(Biblioteca, 0, Tama - 1, CampoOrdenacion);
+	quick_sort(Biblioteca, 0, NumLibros - 1, CampoOrdenacion);
 
 	return &result;
 }
@@ -458,7 +438,7 @@ ordenar_1_svc(TOrdenacion *argp, struct svc_req *rqstp)
 
 	result = FALSE;
 
-	quick_sort(Biblioteca, 0, Tama - 1, argp->Campo);
+	quick_sort(Biblioteca, 0, NumLibros - 1, argp->Campo);
 
 	CampoOrdenacion = argp->Campo;
 
@@ -583,7 +563,7 @@ prestar_1_svc(TPosicion *argp, struct svc_req *rqstp)
 
 	Biblioteca[argp->Pos] = book;
 
-	quick_sort(Biblioteca, 0, Tama - 1, CampoOrdenacion);
+	quick_sort(Biblioteca, 0, NumLibros - 1, CampoOrdenacion);
 
 	return &result;
 }
@@ -625,7 +605,7 @@ devolver_1_svc(TPosicion *argp, struct svc_req *rqstp)
 
 	Biblioteca[argp->Pos] = book;
 
-	quick_sort(Biblioteca, 0, Tama - 1, CampoOrdenacion);
+	quick_sort(Biblioteca, 0, NumLibros - 1, CampoOrdenacion);
 
 	return &result;
 }
