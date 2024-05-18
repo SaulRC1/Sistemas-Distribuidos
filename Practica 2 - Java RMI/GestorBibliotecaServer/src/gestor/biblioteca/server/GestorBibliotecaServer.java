@@ -49,6 +49,10 @@ public class GestorBibliotecaServer
         {
             Logger.getLogger(GestorBibliotecaServer.class.getName()).log(Level.SEVERE, null, ex);
         }
+        finally
+        {
+            scanner.close();
+        }
        
     }
 

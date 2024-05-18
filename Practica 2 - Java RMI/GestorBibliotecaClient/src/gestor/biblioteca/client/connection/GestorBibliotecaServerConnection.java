@@ -11,12 +11,12 @@ import java.rmi.*;
 public class GestorBibliotecaServerConnection
 {
     private String host;
-    private String port;
+    private int port;
     private String resourceName;
     
     private GestorBibliotecaIntf gestorBiblioteca;
 
-    public GestorBibliotecaServerConnection(String host, String port, String resourceName)
+    public GestorBibliotecaServerConnection(String host, int port, String resourceName)
     {
         this.host = host;
         this.port = port;
@@ -38,12 +38,12 @@ public class GestorBibliotecaServerConnection
         this.host = host;
     }
 
-    public String getPort()
+    public int getPort()
     {
         return port;
     }
 
-    public void setPuerto(String port)
+    public void setPuerto(int port)
     {
         this.port = port;
     }

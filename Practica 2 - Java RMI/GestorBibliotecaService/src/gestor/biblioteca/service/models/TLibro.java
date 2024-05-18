@@ -13,7 +13,7 @@ public class TLibro
     private String pais;
     private String idioma;
     private String isbn;
-    private String anio;
+    private int anio;
     
     private int disponibles;
     private int prestados;
@@ -24,7 +24,7 @@ public class TLibro
     }
 
     public TLibro(String titulo, String autor, String pais, String idioma, 
-            String isbn, String anio, int disponibles, int prestados, 
+            String isbn, int anio, int disponibles, int prestados, 
             int reservados)
     {
         this.titulo = titulo;
@@ -88,12 +88,12 @@ public class TLibro
         this.isbn = isbn;
     }
 
-    public String getAnio()
+    public int getAnio()
     {
         return anio;
     }
 
-    public void setAnio(String anio)
+    public void setAnio(int anio)
     {
         this.anio = anio;
     }
