@@ -1,5 +1,6 @@
 package gestor.biblioteca.service.models;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,7 +8,7 @@ import java.util.List;
  *
  * @author Saúl Rodríguez Naranjo
  */
-public class InMemoryBookRepository implements BookRepository
+public class InMemoryBookRepository implements BookRepository, Serializable
 {
     private List<TLibro> books = new ArrayList<>();
 
@@ -35,6 +36,18 @@ public class InMemoryBookRepository implements BookRepository
         }
         
         return null;
+    }
+
+    @Override
+    public int getNumberOfBooks()
+    {
+        return books.size();
+    }
+
+    @Override
+    public List<TLibro> getAllBooks()
+    {
+        return this.books;
     }
 
 }

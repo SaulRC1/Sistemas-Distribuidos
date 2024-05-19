@@ -1,12 +1,13 @@
 package gestor.biblioteca.service.models;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
  *
  * @author Saúl Rodríguez Naranjo
  */
-public class TDatosRepositorio
+public class TDatosRepositorio implements Serializable
 {
     private String repositoryName;
     private String repositoryAddress;

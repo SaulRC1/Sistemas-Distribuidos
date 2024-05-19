@@ -1,5 +1,7 @@
 package gestor.biblioteca.service.util;
 
+import gestor.biblioteca.service.models.TLibro;
+
 /**
  *
  * @author Saúl Rodríguez Naranjo
@@ -32,8 +34,8 @@ public class BookUtils
         return S;
     }
 
-    /*
-    public void Mostrar(int Pos, boolean Cabecera)
+    
+    public void Mostrar(int Pos, boolean Cabecera, TLibro libro)
     {
         if (Cabecera)
         {
@@ -46,11 +48,11 @@ public class BookUtils
             System.out.print("\n");
         }
 
-        String T = Ajustar(String.format("%-58s", Titulo), 58);
-        String A = Ajustar(String.format("%-30s", Autor), 30);
-        String PI = Ajustar(String.format("%-28s", Pais + " (" + Idioma + ")"), 28);
+        String T = Ajustar(String.format("%-58s", libro.getTitulo()), 58);
+        String A = Ajustar(String.format("%-30s", libro.getAutor()), 30);
+        String PI = Ajustar(String.format("%-28s", libro.getPais() + " (" + libro.getIdioma() + ")"), 28);
 
-        System.out.println(String.format("%-5d%s%-18s%-4d%-4d%-4d", Pos + 1, T, Isbn, NoLibros, NoPrestados, NoListaEspera));
-        System.out.println(String.format("     %s%s%-12d", A, PI, Anio));
-    }*/
+        System.out.println(String.format("%-5d%s%-18s%-4d%-4d%-4d", Pos + 1, T, libro.getIsbn(), libro.getDisponibles(), libro.getPrestados(), libro.getReservados()));
+        System.out.println(String.format("     %s%s%-12d", A, PI, libro.getAnio()));
+    }
 }

@@ -6,7 +6,7 @@ package gestor.biblioteca.client.properties;
  */
 public class GestorBibliotecaUserProperties 
 {
-    private int adminId;
+    private int adminId = -1000;
     
     private static final GestorBibliotecaUserProperties instance = new GestorBibliotecaUserProperties();
     

@@ -1,12 +1,13 @@
 package gestor.biblioteca.service.models;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
  *
  * @author Saúl Rodríguez Naranjo
  */
-public class TLibro
+public class TLibro implements Serializable, Cloneable
 {
     private String titulo;
     private String autor;
@@ -212,5 +213,16 @@ public class TLibro
         sb.append('}');
         return sb.toString();
     }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException
+    {
+        TLibro clone = new TLibro(titulo, autor, pais, idioma, isbn, anio, 
+                disponibles, prestados, reservados);
+        
+        return clone;
+    }
+    
+    
     
 }
