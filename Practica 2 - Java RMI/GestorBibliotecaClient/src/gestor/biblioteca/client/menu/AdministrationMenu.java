@@ -149,7 +149,69 @@ public class AdministrationMenu
 
     public void executeOption2()
     {
+        try
+        {
+            int numberOfRepositories = gestorBiblioteca.NRepositorios(
+                    GestorBibliotecaUserProperties.getInstance().getAdminId());
+            
+            if(numberOfRepositories == -1)
+            {
+                System.out.println("ERROR: Ya hay otro usuario identificado como"
+                        + "administrador");
+                
+                return;
+            }
+            
+            if(numberOfRepositories == 0)
+            {
+                System.out.println("ERROR: No hay repositorios cargados en la biblioteca");
+                return;
+            }
 
+            List<TDatosRepositorio> repositories = new ArrayList<>();
+
+            for (int i = 0; i < numberOfRepositories; i++)
+            {
+                TDatosRepositorio repository = gestorBiblioteca.DatosRepositorio(
+                        GestorBibliotecaUserProperties.getInstance().getAdminId(),
+                        i);
+
+                if (repository != null)
+                {
+                    repositories.add(repository);
+                }
+            }
+
+            TDatosRepositorioUtils.showRepositoriesListWithAllOption(repositories);
+
+            System.out.println("Elige repositorio: ");
+            int repositoryPosition = scanner.nextInt();
+            
+            int result = gestorBiblioteca.GuardarRepositorio(GestorBibliotecaUserProperties
+                    .getInstance().getAdminId(), repositoryPosition);
+            
+            if(result == -1)
+            {
+                System.out.println("ERROR: Ya hay un usuario identificado como"
+                        + " administrador");
+            }
+            else if(result == -2)
+            {
+                System.out.println("ERROR: El repositorio indicado no existe");
+            }
+            else if(result == 0)
+            {
+                System.out.println("ERROR: No se ha podido guardar el repositorio");
+            }
+            else if(result == 1)
+            {
+                System.out.println("** Se ha guardado el/los repositorios **");
+            }
+            
+        } catch (RemoteException ex)
+        {
+            Logger.getLogger(AdministrationMenu.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public void executeOption3()

@@ -12,6 +12,7 @@ public class TDatosRepositorio implements Serializable
     private String repositoryName;
     private String repositoryAddress;
     private int numberOfBooks;
+    private String repositoryFilePath;
     
     private BookRepository bookRepository;
 
@@ -20,12 +21,13 @@ public class TDatosRepositorio implements Serializable
     }
 
     public TDatosRepositorio(String repositoryName, String repositoryAddress, int numberOfBooks,
-            BookRepository bookRepository)
+            BookRepository bookRepository, String repositoryFilePath)
     {
         this.repositoryName = repositoryName;
         this.repositoryAddress = repositoryAddress;
         this.numberOfBooks = numberOfBooks;
         this.bookRepository = bookRepository;
+        this.repositoryFilePath = repositoryFilePath;
     }
 
     public String getRepositoryName()
@@ -66,6 +68,16 @@ public class TDatosRepositorio implements Serializable
     public void setBookRepository(BookRepository bookRepository)
     {
         this.bookRepository = bookRepository;
+    }
+
+    public String getRepositoryFilePath()
+    {
+        return repositoryFilePath;
+    }
+
+    public void setRepositoryFilePath(String repositoryFilePath)
+    {
+        this.repositoryFilePath = repositoryFilePath;
     }
 
     @Override

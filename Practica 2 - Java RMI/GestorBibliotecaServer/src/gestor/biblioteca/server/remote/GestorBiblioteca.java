@@ -7,8 +7,10 @@ import gestor.biblioteca.service.models.InMemoryBookRepository;
 import gestor.biblioteca.service.models.TDatosRepositorio;
 import gestor.biblioteca.service.models.TLibro;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.rmi.RemoteException;
@@ -116,7 +118,7 @@ public class GestorBiblioteca implements GestorBibliotecaIntf
             BookRepository bookRepository = new InMemoryBookRepository();
 
             TDatosRepositorio repositoryData = new TDatosRepositorio(repositoryName,
-                    repositoryAddress, numberOfBooks, bookRepository);
+                    repositoryAddress, numberOfBooks, bookRepository, pNomFichero);
 
             if (loadedRepositories.contains(repositoryData))
             {
@@ -144,6 +146,8 @@ public class GestorBiblioteca implements GestorBibliotecaIntf
             loadedRepositories.add(repositoryData);
             
             Ordenar(pIda, sortingField);
+            
+            inputStream.close();
 
         } catch (FileNotFoundException ex)
         {
@@ -161,7 +165,94 @@ public class GestorBiblioteca implements GestorBibliotecaIntf
     @Override
     public int GuardarRepositorio(int pIda, int pRepo) throws RemoteException
     {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        if (pIda != adminId)
+        {
+            return -1;
+        }
+        
+        if (pRepo < 0 || pRepo >= this.loadedRepositories.size())
+        {
+            return -2;
+        }
+        
+        try
+        {
+            pRepo--;
+            
+            if(pRepo == -1)
+            {
+                for (TDatosRepositorio repository : loadedRepositories)
+                {
+                    DataOutputStream outputStream = new DataOutputStream(new FileOutputStream(
+                            Paths.get(repository.getRepositoryFilePath()).toAbsolutePath().toString()));
+
+                    outputStream.writeInt(repository.getNumberOfBooks());
+                    outputStream.writeUTF(repository.getRepositoryName());
+                    outputStream.writeUTF(repository.getRepositoryAddress());
+
+                    List<TLibro> repositoryBooks = repository.getBookRepository().getAllBooks();
+
+                    for (int i = 0; i < repositoryBooks.size(); i++)
+                    {
+                        TLibro book = repositoryBooks.get(i);
+
+                        outputStream.writeUTF(book.getIsbn());
+                        outputStream.writeUTF(book.getTitulo());
+                        outputStream.writeUTF(book.getAutor());
+                        outputStream.writeInt(book.getAnio());
+                        outputStream.writeUTF(book.getPais());
+                        outputStream.writeUTF(book.getIdioma());
+                        outputStream.writeInt(book.getDisponibles());
+                        outputStream.writeInt(book.getPrestados());
+                        outputStream.writeInt(book.getReservados());
+                    }
+                    
+                    outputStream.close();
+                }
+            }
+            else
+            {
+                TDatosRepositorio repository = this.loadedRepositories.get(pRepo);
+
+                DataOutputStream outputStream = new DataOutputStream(new FileOutputStream(
+                        Paths.get(repository.getRepositoryFilePath()).toAbsolutePath().toString()));
+
+                outputStream.writeInt(repository.getNumberOfBooks());
+                outputStream.writeUTF(repository.getRepositoryName());
+                outputStream.writeUTF(repository.getRepositoryAddress());
+
+                List<TLibro> repositoryBooks = repository.getBookRepository().getAllBooks();
+
+                for (int i = 0; i < repositoryBooks.size(); i++)
+                {
+                    TLibro book = repositoryBooks.get(i);
+
+                    outputStream.writeUTF(book.getIsbn());
+                    outputStream.writeUTF(book.getTitulo());
+                    outputStream.writeUTF(book.getAutor());
+                    outputStream.writeInt(book.getAnio());
+                    outputStream.writeUTF(book.getPais());
+                    outputStream.writeUTF(book.getIdioma());
+                    outputStream.writeInt(book.getDisponibles());
+                    outputStream.writeInt(book.getPrestados());
+                    outputStream.writeInt(book.getReservados());
+                }
+                
+                outputStream.close();
+            }
+            
+
+        } catch (FileNotFoundException ex)
+        {
+            Logger.getLogger(GestorBiblioteca.class.getName()).log(Level.SEVERE, null, ex);
+            return 0;
+        } catch (IOException ex)
+        {
+            Logger.getLogger(GestorBiblioteca.class.getName()).log(Level.SEVERE, null, ex);
+            return 0;
+        }
+        
+        return 1;
     }
 
     @Override
