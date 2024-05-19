@@ -196,7 +196,38 @@ public class GestorBiblioteca implements GestorBibliotecaIntf
     @Override
     public int Comprar(int pIda, String pIsbn, int pNoLibros) throws RemoteException
     {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        if(pIda != adminId)
+        {
+            return -1;
+        }
+        
+        int bookPosition = Buscar(pIda, pIsbn);
+        
+        if (bookPosition < 0)
+        {
+            return 0;
+        }
+        
+        TLibro book = this.generalBookStorage.get(bookPosition);
+        
+        book.setDisponibles(book.getDisponibles() + pNoLibros);
+        
+        if(book.getDisponibles() >= book.getReservados())
+        {
+            book.setDisponibles(book.getDisponibles() - book.getReservados());
+            book.setPrestados(book.getPrestados() + book.getReservados());
+            book.setReservados(0);  
+        }
+        else
+        {
+            book.setReservados(book.getReservados() - book.getDisponibles());
+            book.setPrestados(book.getPrestados() + book.getDisponibles());
+            book.setDisponibles(0);
+        }
+        
+        Ordenar(pIda, sortingField);
+        
+        return 1;
     }
 
     @Override

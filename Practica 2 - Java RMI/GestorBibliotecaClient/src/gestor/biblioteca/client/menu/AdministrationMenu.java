@@ -256,12 +256,95 @@ public class AdministrationMenu
 
     public void executeOption4()
     {
-
+        //Clean buffer
+        scanner.nextLine();
+        
+        String isbn = "";
+        
+        System.out.println("Introduce ISBN a buscar: ");
+        isbn = scanner.nextLine();
+        
+        try
+        {
+            int result = gestorBiblioteca.Buscar(GestorBibliotecaUserProperties.getInstance()
+                    .getAdminId(), isbn);
+            
+            switch (result)
+            {
+                case -2:
+                    System.out.println("ERROR: Ya hay un usuario identificado como"
+                            + "administrador");
+                    break;
+                case -1:
+                    System.out.println("ERROR: No se ha encontrado ningún libro con"
+                            + " el ISBN indicado");
+                    break;
+                default:
+                    TLibro book = gestorBiblioteca.Descargar(GestorBibliotecaUserProperties.getInstance()
+                            .getAdminId(), -1, result);
+                    
+                    if(book == null)
+                    {
+                        System.out.println("ERROR: El libro no existe");
+                        return;
+                    }   
+                    
+                    BookUtils bookUtils = new BookUtils();
+                    bookUtils.Mostrar(result, true, book);
+                    
+                    String option = "";
+                    
+                    do
+                    {
+                        System.out.println("¿Es este el libro del que deseas comprar"
+                            + " más unidades? (s/n)");
+                        option = scanner.nextLine();
+                        
+                        if(!option.equalsIgnoreCase("s") && !option.equalsIgnoreCase("n"))
+                        {
+                            System.out.println("ERROR: Opción incorrecta, indique"
+                                    + "sí o no");
+                        }
+                    } while (!option.equalsIgnoreCase("s") && !option.equalsIgnoreCase("n"));
+                    
+                    if(option.equalsIgnoreCase("s"))
+                    {
+                        int boughtBooks = 0;
+                        
+                        System.out.println("Introduce el número de libros comprados:");
+                        boughtBooks = scanner.nextInt();
+                        
+                        int buyResult = gestorBiblioteca.Comprar(GestorBibliotecaUserProperties.getInstance()
+                            .getAdminId(), isbn, boughtBooks);
+                        
+                        if(buyResult == -1)
+                        {
+                            System.out.println("ERROR: Ya hay un usuario identificado como"
+                            + "administrador");
+                        }
+                        else if(buyResult == 0)
+                        {
+                            System.out.println("ERROR: No se ha encontrado ningún libro con"
+                            + " el ISBN indicado");
+                        }
+                        else if(buyResult == 1)
+                        {
+                            System.out.println("** Se han añadido los nuevos libros **");
+                        }
+                    }
+                    
+                    break;
+            }
+        } catch (RemoteException ex)
+        {
+            System.out.println("ERROR: " + ex.getMessage());
+        }
     }
 
     public void executeOption5()
     {
-
+        //Clean buffer
+        scanner.nextLine();
     }
 
     public void executeOption6()
