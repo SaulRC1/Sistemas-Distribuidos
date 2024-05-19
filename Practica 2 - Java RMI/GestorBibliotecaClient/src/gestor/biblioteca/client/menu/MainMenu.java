@@ -252,7 +252,57 @@ public class MainMenu
 
     public void executeOption3()
     {
-
+        executeOption2();
+        
+        String option = "";
+        
+        do
+        {
+            System.out.println("¿Quieres sacar algún libro de la biblioteca? (s/n)");
+            option = scanner.nextLine();
+            
+            if(!option.equalsIgnoreCase("s") && !option.equalsIgnoreCase("n"))
+            {
+                System.out.println("ERROR: Opción inválida. Por favor, indique "
+                        + "sí o no");
+            }
+            
+        } while (!option.equalsIgnoreCase("s") && !option.equalsIgnoreCase("n"));
+        
+        if(option.equalsIgnoreCase("s"))
+        {
+            int bookPosition = -1;
+            
+            System.out.println("Introduce la posición del libro a solicitar su préstamo:");
+            bookPosition = scanner.nextInt();
+            
+            try
+            {
+                int result = gestorBiblioteca.Prestar((bookPosition - 1));
+                
+                switch (result)
+                {
+                    case -1:
+                        System.out.println("ERROR: La posición indicada no está dentro"
+                                + " de los límites del repositorio mezclado y ordenado");
+                        break;
+                    case 1:
+                        System.out.println("** El préstamo se ha concedido, recoja el"
+                                + " libro en el mostrador **");
+                        break;
+                    case 0:
+                        System.out.println("** Se le ha puesto en lista de espera **");
+                        break;
+                    default:
+                        break;
+                }
+                
+            } catch (RemoteException ex)
+            {
+                Logger.getLogger(MainMenu.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
     }
 
     public void executeOption4()
