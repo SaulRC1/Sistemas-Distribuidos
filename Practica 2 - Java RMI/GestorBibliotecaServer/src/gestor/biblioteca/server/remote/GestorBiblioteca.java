@@ -394,26 +394,50 @@ public class GestorBiblioteca implements GestorBibliotecaIntf
         
         TLibro book = this.generalBookStorage.get(pPos);
         
-        System.out.println("Posición: " + pPos);
-        System.out.println("Libro: " + book.getTitulo());
-        
         if(book.getDisponibles() > 0)
         {
             book.setDisponibles(book.getDisponibles() - 1);
             book.setPrestados(book.getPrestados() + 1);
+            Ordenar(adminId, sortingField);
             return 1;
         }
         else
         {
             book.setReservados(book.getReservados() + 1);
+            Ordenar(adminId, sortingField);
             return 0;
         }
+        
+        
     }
 
     @Override
     public int Devolver(int pPos) throws RemoteException
     {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        if(pPos < 0 || pPos >= this.generalBookStorage.size())
+        {
+            return -1;
+        }
+        
+        TLibro book = this.generalBookStorage.get(pPos);
+        
+        if(book.getReservados() > 0)
+        {
+            book.setReservados(book.getReservados() - 1);
+            book.setPrestados(book.getPrestados() + 1);
+            Ordenar(adminId, sortingField);
+            return 0;
+        }
+        
+        if(book.getReservados() == 0 && book.getPrestados() > 0)
+        {
+            book.setPrestados(book.getPrestados() - 1);
+            book.setDisponibles(book.getDisponibles() + 1);
+            Ordenar(adminId, sortingField);
+            return 1;
+        }
+        
+        return 2;
     }
 
 }

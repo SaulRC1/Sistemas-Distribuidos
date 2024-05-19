@@ -302,12 +302,66 @@ public class MainMenu
                 Logger.getLogger(MainMenu.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
     }
 
     public void executeOption4()
     {
-
+        executeOption2();
+        
+        String option = "";
+        
+        do
+        {
+            System.out.println("¿Quieres devolver algún libro de la biblioteca? (s/n)");
+            option = scanner.nextLine();
+            
+            if(!option.equalsIgnoreCase("s") && !option.equalsIgnoreCase("n"))
+            {
+                System.out.println("ERROR: Opción inválida. Por favor, indique "
+                        + "sí o no");
+            }
+            
+        } while (!option.equalsIgnoreCase("s") && !option.equalsIgnoreCase("n"));
+        
+        if(option.equalsIgnoreCase("s"))
+        {
+            int bookPosition = -1;
+            
+            System.out.println("Introduce la posición del libro a devolver:");
+            bookPosition = scanner.nextInt();
+            
+            try
+            {
+                int result = gestorBiblioteca.Devolver((bookPosition - 1));
+                
+                switch (result)
+                {
+                    case -1:
+                        System.out.println("ERROR: La posición indicada no está dentro"
+                                + " de los límites del repositorio mezclado y ordenado");
+                        break;
+                    case 0:
+                        System.out.println("** Se ha devuelto el libro y se "
+                                + "ha reducido el número de usuarios en espera **");
+                        break;
+                    case 1:
+                        System.out.println("** Se ha devuelto el libro y se "
+                                + "pondrá en la estantería **");
+                        break;
+                    case 2:
+                        System.out.println("ERROR: El libro no se puede devolver, "
+                                + "porque no hay usuarios en lista de espera ni "
+                                + "libros prestados");
+                        break;
+                    default:
+                        break;
+                }
+                
+            } catch (RemoteException ex)
+            {
+                Logger.getLogger(MainMenu.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     public void executeOption(int optionNumber)
