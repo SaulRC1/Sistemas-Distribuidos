@@ -23,10 +23,11 @@ public class TDatosRepositorioUtils
         {
             TDatosRepositorio repository = repositories.get(i);
             
-            System.out.println(i + " \t\t\t" + repository.getRepositoryName() +
+            System.out.println((i + 1) + " \t\t\t" + repository.getRepositoryName() +
                     " \t\t" + repository.getRepositoryAddress() + " \t\t" +
                     repository.getNumberOfBooks());
         }
         
+        System.out.println(0 + " \t\t\tTodos los repositorios");
     }
 }

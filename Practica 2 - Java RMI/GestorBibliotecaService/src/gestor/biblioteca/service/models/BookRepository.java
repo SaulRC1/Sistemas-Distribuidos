@@ -1,5 +1,6 @@
 package gestor.biblioteca.service.models;
 
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -18,5 +19,7 @@ public interface BookRepository
     public int getNumberOfBooks();
     
     public List<TLibro> getAllBooks();
+    
+    public void sortBooks(Comparator<TLibro> comparator);
     
 }

@@ -19,6 +19,7 @@ import java.util.logging.Logger;
  */
 public class AdministrationMenu
 {
+
     public static final String ADMIN_MENU_TITLE = "GESTOR BIBLIOTECARIO 2.0 (M.ADMINISTRACIÓN)";
     public static final String OPTION_0_TITLE = "0.- Salir";
     public static final String OPTION_1_TITLE = "1.- Cargar Repositorio";
@@ -29,7 +30,7 @@ public class AdministrationMenu
     public static final String OPTION_6_TITLE = "6.- Ordenar Libros";
     public static final String OPTION_7_TITLE = "7.- Buscar Libros";
     public static final String OPTION_8_TITLE = "8.- Listar Libros";
-    
+
     private GestorBibliotecaIntf gestorBiblioteca;
     private Scanner scanner;
 
@@ -38,7 +39,7 @@ public class AdministrationMenu
         this.gestorBiblioteca = gestorBiblioteca;
         this.scanner = scanner;
     }
-    
+
     public void executeOption(int optionNumber)
     {
         switch (optionNumber)
@@ -74,7 +75,7 @@ public class AdministrationMenu
                 System.out.println("ERROR: Opción inválida.");
         }
     }
-    
+
     public void show()
     {
         System.out.println(ADMIN_MENU_TITLE);
@@ -89,7 +90,7 @@ public class AdministrationMenu
         System.out.println(OPTION_8_TITLE);
         System.out.println(OPTION_0_TITLE);
     }
-    
+
     public void executeOption0()
     {
         try
@@ -100,37 +101,55 @@ public class AdministrationMenu
             Logger.getLogger(AdministrationMenu.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
-    
+
     public void executeOption1()
     {
         //Clean scanner buffer
         scanner.nextLine();
-        
+
         String fileName = "";
-        
+
         System.out.println("Introduce el nombre del fichero de datos");
         fileName = scanner.nextLine();
-        
+
         try
         {
-            gestorBiblioteca.AbrirRepositorio(GestorBibliotecaUserProperties.getInstance().getAdminId()
-                    , fileName);
+            int result = gestorBiblioteca.AbrirRepositorio(GestorBibliotecaUserProperties.getInstance().getAdminId(),
+                     fileName);
+            
+            switch (result)
+            {
+                case -1:
+                    System.out.println("ERROR: Ya hay un usuario identificado como administrador");
+                    break;
+                case -2:
+                    System.out.println("ERROR: Ya existe un repositorio cargado con el mismo nombre de fichero");
+                    break;
+                case 0:
+                    System.out.println("ERROR: No se ha podido abrir el fichero de repositorio.");
+                    break;
+                case 1:
+                    System.out.println("** El repositorio ha sido cargado **");
+                    break;
+                default:
+                    break;
+            }
         } catch (RemoteException ex)
         {
             Logger.getLogger(AdministrationMenu.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
-    
+
     public void executeOption2()
     {
-        
+
     }
-    
+
     public void executeOption3()
     {
         //clean buffer
         scanner.nextLine();
-        
+
         String isbn;
         String author;
         String title;
@@ -138,116 +157,212 @@ public class AdministrationMenu
         String country;
         String language;
         int available;
-        
+
         System.out.println("Introduce el ISBN: ");
         isbn = scanner.nextLine();
-        
+
         System.out.println("Introduce el autor: ");
         author = scanner.nextLine();
-        
+
         System.out.println("Introduce el título: ");
         title = scanner.nextLine();
-        
+
         System.out.println("Introduce el año:");
         year = scanner.nextInt();
-        
+
         //clean buffer
         scanner.nextLine();
-        
+
         System.out.println("Introduce el país:");
         country = scanner.nextLine();
-        
+
         System.out.println("Introduce el idioma: ");
         language = scanner.nextLine();
-        
+
         System.out.println("Introduce el número de libros inicial:");
         available = scanner.nextInt();
-        
+
         //clean buffer
         scanner.nextLine();
-        
-        TLibro book = new TLibro(title, author, country, language, isbn, year, 
+
+        TLibro book = new TLibro(title, author, country, language, isbn, year,
                 available, 0, 0);
-        
+
         try
         {
             int numberOfRepositories = gestorBiblioteca.NRepositorios(
                     GestorBibliotecaUserProperties.getInstance().getAdminId());
-            
+
             List<TDatosRepositorio> repositories = new ArrayList<>();
-            
+
             for (int i = 0; i < numberOfRepositories; i++)
             {
                 TDatosRepositorio repository = gestorBiblioteca.DatosRepositorio(
                         GestorBibliotecaUserProperties.getInstance().getAdminId(),
                         i);
-                
-                if(repository != null)
+
+                if (repository != null)
                 {
                     repositories.add(repository);
                 }
             }
-            
+
             TDatosRepositorioUtils.showRepositoriesList(repositories);
-            
+
             System.out.println("Elige repositorio: ");
             int repositoryPosition = scanner.nextInt();
-            
+
             gestorBiblioteca.NuevoLibro(GestorBibliotecaUserProperties.getInstance().getAdminId(),
                     book, (repositoryPosition - 1));
-            
+
         } catch (RemoteException ex)
         {
             Logger.getLogger(AdministrationMenu.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public void executeOption4()
     {
-        
+
     }
-    
+
     public void executeOption5()
     {
-        
+
     }
-    
+
     public void executeOption6()
     {
-        
+        //Clean buffer
+        scanner.nextLine();
+
+        int sortingCode = -1;
+
+        System.out.println("Código de Ordenación");
+        System.out.println("0.- Por ISBN");
+        System.out.println("1.- Por Título");
+        System.out.println("2.- Por Autor");
+        System.out.println("3.- Por Año");
+        System.out.println("4.- Por País");
+        System.out.println("5.- Por Idioma");
+        System.out.println("6.- Por nº de libros disponibles");
+        System.out.println("7.- Por nº de libros prestados");
+        System.out.println("8.- Por nº de libros en espera");
+
+        System.out.println("Introduce código:");
+        sortingCode = scanner.nextInt();
+
+        try
+        {
+            boolean result = gestorBiblioteca.Ordenar(GestorBibliotecaUserProperties
+                    .getInstance().getAdminId(), sortingCode);
+            
+            if(result == true)
+            {
+                System.out.println("** La biblioteca ha sido ordenada correctamente **");
+            }
+            else
+            {
+                System.out.println("ERROR: No se ha podido ordenar la biblioteca");
+            }
+
+        } catch (RemoteException ex)
+        {
+            System.out.println("ERROR: " + ex.getMessage());
+        }
+
     }
-    
+
     public void executeOption7()
     {
-        
+        //Clean buffer
+        scanner.nextLine();
+
+        String searchText = "";
+
+        System.out.println("Introduce el texto a buscar: ");
+        searchText = scanner.nextLine();
+
+        String searchCode = "";
+
+        System.out.println("Código de Búsqueda");
+        System.out.println("I.- Por ISBN");
+        System.out.println("T.- Por Título");
+        System.out.println("A.- Por Autor");
+        System.out.println("P.- Por País");
+        System.out.println("D.- Por Idioma");
+        System.out.println("*.- Por todos los campos");
+
+        do
+        {
+            System.out.println("Introduce código: ");
+            searchCode = scanner.nextLine();
+
+            if (!searchCode.equalsIgnoreCase("i") || !searchCode.equalsIgnoreCase("t")
+                    || !searchCode.equalsIgnoreCase("a") || !searchCode.equalsIgnoreCase("p")
+                    || !searchCode.equalsIgnoreCase("d") || !searchCode.equalsIgnoreCase("*"))
+            {
+                System.out.println("ERORR: El código introducido no es válido");
+            }
+        } while (!searchCode.equalsIgnoreCase("i") || !searchCode.equalsIgnoreCase("t")
+                || !searchCode.equalsIgnoreCase("a") || !searchCode.equalsIgnoreCase("p")
+                || !searchCode.equalsIgnoreCase("d") || !searchCode.equalsIgnoreCase("*"));
+
+        try
+        {
+            int numberOfRepositories = gestorBiblioteca.NRepositorios(
+                    GestorBibliotecaUserProperties.getInstance().getAdminId());
+
+            List<TDatosRepositorio> repositories = new ArrayList<>();
+
+            for (int i = 0; i < numberOfRepositories; i++)
+            {
+                TDatosRepositorio repository = gestorBiblioteca.DatosRepositorio(
+                        GestorBibliotecaUserProperties.getInstance().getAdminId(),
+                        i);
+
+                if (repository != null)
+                {
+                    repositories.add(repository);
+                }
+            }
+
+            TDatosRepositorioUtils.showRepositoriesList(repositories);
+
+            System.out.println("Elige repositorio: ");
+            int repositoryPosition = scanner.nextInt();
+
+        } catch (RemoteException ex)
+        {
+            Logger.getLogger(AdministrationMenu.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
-    
+
     public void executeOption8()
     {
         int adminId = GestorBibliotecaUserProperties.getInstance().getAdminId();
-        
+
         BookUtils bookUtils = new BookUtils();
-        
+
         try
         {
             int totalNumberOfBooks = gestorBiblioteca.NLibros(-1);
-            
-            System.out.println("Total number of books: " + totalNumberOfBooks);
-            
+
+            System.out.println("Número total de libros: " + totalNumberOfBooks);
+
             for (int i = 0; i < totalNumberOfBooks; i++)
             {
                 TLibro book = gestorBiblioteca.Descargar(adminId, -1, i);
-                
-                if(i == 0)
+
+                if (i == 0)
                 {
-                   bookUtils.Mostrar(i, true, book); 
-                }
-                else
+                    bookUtils.Mostrar(i, true, book);
+                } else
                 {
                     bookUtils.Mostrar(i, false, book);
-                }  
+                }
             }
-            
+
         } catch (RemoteException ex)
         {
             Logger.getLogger(AdministrationMenu.class.getName()).log(Level.SEVERE, null, ex);
