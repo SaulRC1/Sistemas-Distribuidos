@@ -172,7 +172,7 @@ public class GestorBiblioteca implements GestorBibliotecaIntf
             return -1;
         }
 
-        if (pRepo >= this.loadedRepositories.size())
+        if (pRepo < 0 || pRepo >= this.loadedRepositories.size())
         {
             return -2;
         }
@@ -187,6 +187,8 @@ public class GestorBiblioteca implements GestorBibliotecaIntf
         repository.getBookRepository().addBook(L);
         repository.setNumberOfBooks(repository.getNumberOfBooks() + 1);
         generalBookStorage.add(L);
+        
+        Ordenar(pIda, sortingField);
 
         return 1;
     }

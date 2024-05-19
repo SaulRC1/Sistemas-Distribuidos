@@ -192,6 +192,20 @@ public class AdministrationMenu
         {
             int numberOfRepositories = gestorBiblioteca.NRepositorios(
                     GestorBibliotecaUserProperties.getInstance().getAdminId());
+            
+            if(numberOfRepositories == -1)
+            {
+                System.out.println("ERROR: Ya hay otro usuario identificado como"
+                        + "administrador");
+                
+                return;
+            }
+            
+            if(numberOfRepositories == 0)
+            {
+                System.out.println("ERROR: No hay repositorios cargados en la biblioteca");
+                return;
+            }
 
             List<TDatosRepositorio> repositories = new ArrayList<>();
 
@@ -212,12 +226,31 @@ public class AdministrationMenu
             System.out.println("Elige repositorio: ");
             int repositoryPosition = scanner.nextInt();
 
-            gestorBiblioteca.NuevoLibro(GestorBibliotecaUserProperties.getInstance().getAdminId(),
+            int result = gestorBiblioteca.NuevoLibro(GestorBibliotecaUserProperties.getInstance().getAdminId(),
                     book, (repositoryPosition - 1));
+            
+            switch (result)
+            {
+                case -1:
+                    System.out.println("ERROR: Ya hay un usuario identificado como "
+                            + "administrador");
+                    break;
+                case -2:
+                    System.out.println("ERROR: El repositorio indicado no existe");
+                    break;
+                case 0:
+                    System.out.println("ERROR: El libro ya existe dentro de la biblioteca");
+                    break;
+                case 1:
+                    System.out.println("** El libro ha sido añadido correctamente **");
+                    break;
+                default:
+                    break;
+            }
 
         } catch (RemoteException ex)
         {
-            Logger.getLogger(AdministrationMenu.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("ERROR: " + ex.getMessage());
         }
     }
 
