@@ -5,6 +5,13 @@ import gestor.biblioteca.client.utils.TDatosRepositorioUtils;
 import gestor.biblioteca.service.GestorBibliotecaIntf;
 import gestor.biblioteca.service.models.TDatosRepositorio;
 import gestor.biblioteca.service.models.TLibro;
+import gestor.biblioteca.service.models.handling.BookSearcher;
+import static gestor.biblioteca.service.models.handling.BookSearcher.ALL_SEARCH_FIELD;
+import static gestor.biblioteca.service.models.handling.BookSearcher.AUTHOR_SEARCH_FIELD;
+import static gestor.biblioteca.service.models.handling.BookSearcher.COUNTRY_SEARCH_FIELD;
+import static gestor.biblioteca.service.models.handling.BookSearcher.ISBN_SEARCH_FIELD;
+import static gestor.biblioteca.service.models.handling.BookSearcher.LANGUAGE_SEARCH_FIELD;
+import static gestor.biblioteca.service.models.handling.BookSearcher.TITLE_SEARCH_FIELD;
 import gestor.biblioteca.service.util.BookUtils;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -499,20 +506,34 @@ public class AdministrationMenu
             System.out.println("Introduce código: ");
             searchCode = scanner.nextLine();
 
-            if (!searchCode.equalsIgnoreCase("i") || !searchCode.equalsIgnoreCase("t")
-                    || !searchCode.equalsIgnoreCase("a") || !searchCode.equalsIgnoreCase("p")
-                    || !searchCode.equalsIgnoreCase("d") || !searchCode.equalsIgnoreCase("*"))
+            if (!searchCode.equalsIgnoreCase("i") && !searchCode.equalsIgnoreCase("t")
+                    && !searchCode.equalsIgnoreCase("a") && !searchCode.equalsIgnoreCase("p")
+                    && !searchCode.equalsIgnoreCase("d") && !searchCode.equalsIgnoreCase("*"))
             {
                 System.out.println("ERORR: El código introducido no es válido");
             }
-        } while (!searchCode.equalsIgnoreCase("i") || !searchCode.equalsIgnoreCase("t")
-                || !searchCode.equalsIgnoreCase("a") || !searchCode.equalsIgnoreCase("p")
-                || !searchCode.equalsIgnoreCase("d") || !searchCode.equalsIgnoreCase("*"));
+        } while (!searchCode.equalsIgnoreCase("i") && !searchCode.equalsIgnoreCase("t")
+                && !searchCode.equalsIgnoreCase("a") && !searchCode.equalsIgnoreCase("p")
+                && !searchCode.equalsIgnoreCase("d") && !searchCode.equalsIgnoreCase("*"));
 
         try
         {
             int numberOfRepositories = gestorBiblioteca.NRepositorios(
                     GestorBibliotecaUserProperties.getInstance().getAdminId());
+            
+            if(numberOfRepositories == -1)
+            {
+                System.out.println("ERROR: Ya hay otro usuario identificado como"
+                        + "administrador");
+                
+                return;
+            }
+            
+            if(numberOfRepositories == 0)
+            {
+                System.out.println("ERROR: No hay repositorios cargados en la biblioteca");
+                return;
+            }
 
             List<TDatosRepositorio> repositories = new ArrayList<>();
 
@@ -528,10 +549,137 @@ public class AdministrationMenu
                 }
             }
 
-            TDatosRepositorioUtils.showRepositoriesList(repositories);
+            TDatosRepositorioUtils.showRepositoriesListWithAllOption(repositories);
 
             System.out.println("Elige repositorio: ");
             int repositoryPosition = scanner.nextInt();
+            
+            repositoryPosition--;
+            
+            BookUtils bookUtils = new BookUtils();
+            
+            if(repositoryPosition == -1)
+            {
+                int adminId = GestorBibliotecaUserProperties.getInstance().getAdminId();
+                
+                int totalNumberOfBooks = gestorBiblioteca.NLibros(-1);
+                
+                List<TLibro> allBooks = new ArrayList<TLibro>();
+
+                for (int i = 0; i < totalNumberOfBooks; i++)
+                {
+                    TLibro book = gestorBiblioteca.Descargar(adminId, -1, i);
+
+                    if(book != null)
+                    {
+                        allBooks.add(book);
+                    }
+                }
+                
+                boolean headerShow = true;
+                
+                if (searchCode.equalsIgnoreCase(ISBN_SEARCH_FIELD))
+                {
+                    for (int i = 0; i < allBooks.size(); i++)
+                    {
+                        TLibro book = allBooks.get(i);
+                        
+                        if (book.getIsbn().contains(searchText))
+                        {
+                            bookUtils.Mostrar(i, headerShow, book);
+                            headerShow = false;
+                        }
+                    }
+                } else if (searchCode.equalsIgnoreCase(TITLE_SEARCH_FIELD))
+                {
+                    for (int i = 0; i < allBooks.size(); i++)
+                    {
+                        TLibro book = allBooks.get(i);
+                        
+                        if (book.getTitulo().contains(searchText))
+                        {
+                            bookUtils.Mostrar(i, headerShow, book);
+                            headerShow = false;
+                        }
+                    }
+                } else if (searchCode.equalsIgnoreCase(AUTHOR_SEARCH_FIELD))
+                {
+                    for (int i = 0; i < allBooks.size(); i++)
+                    {
+                        TLibro book = allBooks.get(i);
+                        
+                        if (book.getAutor().contains(searchText))
+                        {
+                            bookUtils.Mostrar(i, headerShow, book);
+                            headerShow = false;
+                        }
+                    }
+                } else if (searchCode.equalsIgnoreCase(COUNTRY_SEARCH_FIELD))
+                {
+                    for (int i = 0; i < allBooks.size(); i++)
+                    {
+                        TLibro book = allBooks.get(i);
+                        
+                        if (book.getPais().contains(searchText))
+                        {
+                            bookUtils.Mostrar(i, headerShow, book);
+                            headerShow = false;
+                        }
+                    }
+                } else if (searchCode.equalsIgnoreCase(LANGUAGE_SEARCH_FIELD))
+                {
+                    for (int i = 0; i < allBooks.size(); i++)
+                    {
+                        TLibro book = allBooks.get(i);
+                        
+                        if (book.getIdioma().contains(searchText))
+                        {
+                            bookUtils.Mostrar(i, headerShow, book);
+                            headerShow = false;
+                        }
+                    }
+                } else if (searchCode.equalsIgnoreCase(ALL_SEARCH_FIELD))
+                {
+                    for (int i = 0; i < allBooks.size(); i++)
+                    {
+                        TLibro book = allBooks.get(i);
+                        
+                        if (book.getIsbn().contains(searchText) || book.getTitulo().contains(searchText)
+                                || book.getAutor().contains(searchText) || book.getPais().contains(searchText)
+                                || book.getIdioma().contains(searchText))
+                        {
+                            bookUtils.Mostrar(i, headerShow, book);
+                            headerShow = false;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                TDatosRepositorio repository = repositories.get(repositoryPosition);
+                
+                List<TLibro> foundBooks = repository.getBookRepository()
+                        .getBooksBy(new BookSearcher(searchCode, searchText));
+                
+                if(foundBooks.isEmpty())
+                {
+                    System.out.println("ERROR: No hay ningun libro que coincida con la busqueda");
+                }
+                
+                for (int i = 0; i < foundBooks.size(); i++)
+                {
+                    TLibro book = foundBooks.get(i);
+                    
+                    if(i == 0)
+                    {
+                        bookUtils.Mostrar(i, true, book);
+                    }
+                    else
+                    {
+                        bookUtils.Mostrar(i, false, book);
+                    }
+                }
+            }
 
         } catch (RemoteException ex)
         {

@@ -1,5 +1,6 @@
 package gestor.biblioteca.service.models;
 
+import gestor.biblioteca.service.models.handling.Searcher;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -55,6 +56,12 @@ public class InMemoryBookRepository implements BookRepository, Serializable
     public void sortBooks(Comparator<TLibro> comparator)
     {
         this.books.sort(comparator);
+    }
+
+    @Override
+    public List<TLibro> getBooksBy(Searcher<TLibro> searcher)
+    {
+        return searcher.search(this.books);
     }
 
 }

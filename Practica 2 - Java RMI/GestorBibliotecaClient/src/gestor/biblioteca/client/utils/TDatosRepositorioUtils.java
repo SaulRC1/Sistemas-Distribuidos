@@ -1,6 +1,7 @@
 package gestor.biblioteca.client.utils;
 
 import gestor.biblioteca.service.models.TDatosRepositorio;
+import gestor.biblioteca.service.models.TLibro;
 import java.util.List;
 
 /**
