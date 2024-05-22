@@ -13,14 +13,37 @@ namespace GestorBibliotecaService
     {
         static void Main(string[] args)
         {
-            ChannelServices.RegisterChannel(new TcpChannel(9000), false);
-            Console.WriteLine("Registrando el servicio de Gestor Bibliotecario en modo Singleton...");
-            RemotingConfiguration.RegisterWellKnownServiceType(typeof(GestorBibliotecaService), "GestorBiblioteca",
-                WellKnownObjectMode.Singleton);
+            int port;
+            bool parsingResult = false;
 
-            Console.WriteLine("Esperando llamadas remotas...");
-            Console.WriteLine("Pulsa enter para salir...");
-            Console.ReadLine();
+            do
+            {
+                Console.WriteLine("Indica puerto TCP para iniciar el servidor: ");
+                parsingResult = Int32.TryParse(Console.ReadLine(), out port);
+
+                if (!parsingResult)
+                {
+                    Console.WriteLine("Por favor, indique un puerto válido.");
+                }
+            } while (!parsingResult);
+
+            try
+            {
+                ChannelServices.RegisterChannel(new TcpChannel(port), false);
+                Console.WriteLine("Registrando el servicio de Gestor Bibliotecario en modo Singleton...");
+                RemotingConfiguration.RegisterWellKnownServiceType(typeof(GestorBibliotecaService), "GestorBiblioteca",
+                    WellKnownObjectMode.Singleton);
+
+                Console.WriteLine("Esperando llamadas remotas...");
+                Console.WriteLine("Pulsa enter para salir...");
+                Console.ReadLine();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                Console.ReadLine();
+            }
+            
         }
     }
 }

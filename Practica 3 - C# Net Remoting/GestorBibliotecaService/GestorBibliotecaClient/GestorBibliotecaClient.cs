@@ -12,10 +12,37 @@ namespace GestorBibliotecaService
     {
         static void Main(string[] args)
         {
-            ChannelServices.RegisterChannel(new TcpChannel(), false);
+            string host;
+            int port;
+            bool parsingResult = false;
 
-            GestorBibliotecaService gestorBiblioteca = (GestorBibliotecaService)Activator.GetObject(typeof(GestorBibliotecaService),
-                "tcp://localhost:9000/GestorBiblioteca");
+            Console.WriteLine("Indique host al que quiere conectarse:");
+            host = Console.ReadLine();
+
+            do
+            {
+                Console.WriteLine("Indique puerto del host:");
+                parsingResult = Int32.TryParse(Console.ReadLine(), out port);
+
+                if(!parsingResult)
+                {
+                    Console.WriteLine("Por favor, indique un puerto válido.");
+                }
+            } while (!parsingResult);
+
+            try
+            {
+                ChannelServices.RegisterChannel(new TcpChannel(), false);
+
+                GestorBibliotecaService gestorBiblioteca = (GestorBibliotecaService)Activator.GetObject(typeof(GestorBibliotecaService),
+                    "tcp://" + host + ":" + port + "/GestorBiblioteca");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                Console.ReadLine();
+            }
+            
 
 
 
