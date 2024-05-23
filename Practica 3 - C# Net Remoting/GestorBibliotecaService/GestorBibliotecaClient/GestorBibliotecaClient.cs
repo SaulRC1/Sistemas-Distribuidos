@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GestorBibliotecaService.Menu;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Remoting.Channels;
@@ -36,6 +37,19 @@ namespace GestorBibliotecaService
 
                 GestorBibliotecaService gestorBiblioteca = (GestorBibliotecaService)Activator.GetObject(typeof(GestorBibliotecaService),
                     "tcp://" + host + ":" + port + "/GestorBiblioteca");
+
+                int option = -1;
+
+                MainMenu mainMenu = new MainMenu(gestorBiblioteca);
+
+                do
+                {
+                    mainMenu.showMainMenu();
+                    Int32.TryParse(Console.ReadLine(), out option);
+
+                    mainMenu.executeOption(option);
+
+                } while (true);
             }
             catch (Exception ex)
             {
@@ -43,9 +57,6 @@ namespace GestorBibliotecaService
                 Console.ReadLine();
             }
             
-
-
-
         }
     }
 }

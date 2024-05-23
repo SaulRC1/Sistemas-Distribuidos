@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GestorBibliotecaService
 {
-    class TDatosRepositorio
+    public class TDatosRepositorio
     {
     }
 }
