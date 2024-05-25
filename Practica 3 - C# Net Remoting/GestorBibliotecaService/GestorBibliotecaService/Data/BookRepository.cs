@@ -18,7 +18,7 @@ namespace GestorBibliotecaService.Data
 
         List<TLibro> GetAllBooks();
 
-        //void SortBooks(Comparator<TLibro> comparator);
+        void SortBooks(IComparer<TLibro> comparer);
 
         //List<TLibro> GetBooksBy(Searcher<TLibro> searcher);
     }

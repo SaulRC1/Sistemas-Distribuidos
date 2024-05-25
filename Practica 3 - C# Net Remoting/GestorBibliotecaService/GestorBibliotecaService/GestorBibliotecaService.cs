@@ -1,4 +1,5 @@
 ﻿using GestorBibliotecaService.Data;
+using GestorBibliotecaService.Data.Handling;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,13 +17,13 @@ namespace GestorBibliotecaService
 
         private List<TDatosRepositorio> loadedRepositories = new List<TDatosRepositorio>();
 
-        private int sortingField = 0;
+        private int sortingField = BookComparer.ISBN_SORTING_FIELD;
 
         private List<TLibro> generalBookStorage = new List<TLibro>();
 
         public int AbrirRepositorio(int pIda, string pNomFichero)
         {
-            if(pIda != adminId)
+            if (pIda != adminId)
             {
                 return -1;
             }
@@ -45,7 +46,7 @@ namespace GestorBibliotecaService
                 TDatosRepositorio repositoryData = new TDatosRepositorio(repositoryName,
                     repositoryAddress, numberOfBooks, bookRepository, pNomFichero);
 
-                if(loadedRepositories.Contains(repositoryData))
+                if (loadedRepositories.Contains(repositoryData))
                 {
                     return -2;
                 }
@@ -92,7 +93,7 @@ namespace GestorBibliotecaService
                     binaryReader.Dispose();
                 }
             }
-            
+
         }
 
         public int Buscar(int pIda, string pIsbn)
@@ -134,20 +135,20 @@ namespace GestorBibliotecaService
 
         public TLibro Descargar(int pIda, int pRepo, int pPos)
         {
-            if(pRepo != -1 && pRepo >= this.loadedRepositories.Count())
+            if (pRepo != -1 && pRepo >= this.loadedRepositories.Count())
             {
                 return null;
             }
 
-            if(pRepo == -1)
+            if (pRepo == -1)
             {
-                if(pPos < 0 || pPos >= this.generalBookStorage.Count())
+                if (pPos < 0 || pPos >= this.generalBookStorage.Count())
                 {
                     return null;
                 }
 
-                TLibro generalBook = (TLibro) this.generalBookStorage.ElementAt(pPos).Clone();
-                
+                TLibro generalBook = (TLibro)this.generalBookStorage.ElementAt(pPos).Clone();
+
                 if (pIda != adminId)
                 {
                     generalBook.Prestados = 0;
@@ -159,14 +160,14 @@ namespace GestorBibliotecaService
 
             TDatosRepositorio repositoryData = this.loadedRepositories.ElementAt(pRepo);
 
-            if(pPos < 0 || pPos >= repositoryData.BookRepository.GetNumberOfBooks())
+            if (pPos < 0 || pPos >= repositoryData.BookRepository.GetNumberOfBooks())
             {
                 return null;
             }
 
-            TLibro book = (TLibro) repositoryData.BookRepository.GetAllBooks().ElementAt(pPos).Clone();
+            TLibro book = (TLibro)repositoryData.BookRepository.GetAllBooks().ElementAt(pPos).Clone();
 
-            if(pIda != adminId)
+            if (pIda != adminId)
             {
                 book.Prestados = 0;
                 book.Reservados = 0;
@@ -199,12 +200,12 @@ namespace GestorBibliotecaService
 
         public int NLibros(int pRepo)
         {
-            if(pRepo != -1 && pRepo >= this.loadedRepositories.Count())
+            if (pRepo != -1 && pRepo >= this.loadedRepositories.Count())
             {
                 return -1;
             }
 
-            if(pRepo == -1)
+            if (pRepo == -1)
             {
                 int numberOfBooks = 0;
 
@@ -231,6 +232,27 @@ namespace GestorBibliotecaService
 
         public bool Ordenar(int pIda, int pCampo)
         {
+            if (pIda != adminId)
+            {
+                return false;
+            }
+
+            if (pCampo < BookComparer.ISBN_SORTING_FIELD || pCampo > BookComparer.BOOKED_SORTING_FIELD)
+            {
+                return false;
+            }
+
+            BookComparer bookComparer = new BookComparer(pCampo);
+
+            this.generalBookStorage.Sort(bookComparer);
+
+            foreach (TDatosRepositorio repositoryData in loadedRepositories)
+            {
+                repositoryData.BookRepository.SortBooks(bookComparer);
+            }
+
+            this.sortingField = pCampo;
+
             return true;
         }
 

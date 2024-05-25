@@ -46,5 +46,10 @@ namespace GestorBibliotecaService.Data
         {
             return this.books.Count;
         }
+
+        public void SortBooks(IComparer<TLibro> comparer)
+        {
+            this.books.Sort(comparer);
+        }
     }
 }

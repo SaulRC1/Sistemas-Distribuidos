@@ -51,7 +51,7 @@ namespace GestorBibliotecaService.Menu
                     //executeOption5();
                     break;
                 case 6:
-                    //executeOption6();
+                    executeOption6();
                     break;
                 case 7:
                     //executeOption7();
@@ -126,6 +126,56 @@ namespace GestorBibliotecaService.Menu
             {
                 Console.WriteLine("Error: " + ex.ToString());
             }
+        }
+
+        public void executeOption6()
+        {
+            int sortingCode = -1;
+
+            Console.WriteLine("Código de Ordenación");
+            Console.WriteLine("0.- Por ISBN");
+            Console.WriteLine("1.- Por Título");
+            Console.WriteLine("2.- Por Autor");
+            Console.WriteLine("3.- Por Año");
+            Console.WriteLine("4.- Por País");
+            Console.WriteLine("5.- Por Idioma");
+            Console.WriteLine("6.- Por nº de libros disponibles");
+            Console.WriteLine("7.- Por nº de libros prestados");
+            Console.WriteLine("8.- Por nº de libros en espera");
+
+            do
+            {
+                Console.WriteLine("Introduce código:");
+                Int32.TryParse(Console.ReadLine(), out sortingCode);
+
+                if (sortingCode < 0 || sortingCode > 8)
+                {
+                    Console.WriteLine("Error: Introduzca un valor válido");
+                }
+
+            } while (sortingCode < 0 || sortingCode > 8);
+            
+
+            try
+            {
+                bool result = gestorBiblioteca.Ordenar(GestorBibliotecaUserProperties
+                        .getInstance().AdminId, sortingCode);
+
+                if (result == true)
+                {
+                    Console.WriteLine("** La biblioteca ha sido ordenada correctamente **");
+                }
+                else
+                {
+                    Console.WriteLine("ERROR: No se ha podido ordenar la biblioteca");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("ERROR: " + ex.ToString());
+            }
+
         }
 
         public void executeOption8()
