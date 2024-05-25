@@ -35,7 +35,7 @@ namespace GestorBibliotecaService.Menu
                     executeOption0();
                     break;
                 case 1:
-                    //executeOption1();
+                    executeOption1();
                     break;
                 case 2:
                     //executeOption2();
@@ -84,6 +84,42 @@ namespace GestorBibliotecaService.Menu
             try
             {
                 gestorBiblioteca.Desconexion(GestorBibliotecaUserProperties.getInstance().AdminId);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: " + ex.ToString());
+            }
+        }
+
+        public void executeOption1()
+        {
+            String fileName = "";
+
+            Console.WriteLine("Introduce el nombre del fichero de datos");
+            fileName = Console.ReadLine();
+
+            try
+            {
+                int result = gestorBiblioteca.AbrirRepositorio(GestorBibliotecaUserProperties.getInstance().AdminId,
+                         fileName);
+
+                switch (result)
+                {
+                    case -1:
+                        Console.WriteLine("ERROR: Ya hay un usuario identificado como administrador");
+                        break;
+                    case -2:
+                        Console.WriteLine("ERROR: Ya existe un repositorio cargado con el mismo nombre de fichero");
+                        break;
+                    case 0:
+                        Console.WriteLine("ERROR: No se ha podido abrir el fichero de repositorio.");
+                        break;
+                    case 1:
+                        Console.WriteLine("** El repositorio ha sido cargado **");
+                        break;
+                    default:
+                        break;
+                }
             }
             catch (Exception ex)
             {

@@ -1,5 +1,7 @@
-﻿using System;
+﻿using GestorBibliotecaService.Data;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,9 +14,85 @@ namespace GestorBibliotecaService
 
         private const string adminPassword = "1234";
 
+        private List<TDatosRepositorio> loadedRepositories = new List<TDatosRepositorio>();
+
+        private int sortingField = 0;
+
+        //private List<TLibro> generalBookStorage = new List<TLibro>();
+
         public int AbrirRepositorio(int pIda, string pNomFichero)
         {
-            throw new NotImplementedException();
+            if(pIda != adminId)
+            {
+                return -1;
+            }
+
+            FileStream fs = null;
+            BinaryReader binaryReader = null;
+
+            try
+            {
+                fs = File.Open(pNomFichero, FileMode.Open);
+
+                binaryReader = new BinaryReader(fs, Encoding.UTF8, false);
+
+                int numberOfBooks = binaryReader.ReadInt32();
+                string repositoryName = binaryReader.ReadString();
+                string repositoryAddress = binaryReader.ReadString();
+
+                BookRepository bookRepository = new InMemoryBookRepository();
+
+                TDatosRepositorio repositoryData = new TDatosRepositorio(repositoryName,
+                    repositoryAddress, numberOfBooks, bookRepository, pNomFichero);
+
+                if(loadedRepositories.Contains(repositoryData))
+                {
+                    return -2;
+                }
+
+                for (int i = 0; i < numberOfBooks; i++)
+                {
+                    string isbn = binaryReader.ReadString();
+                    string title = binaryReader.ReadString();
+                    string author = binaryReader.ReadString();
+                    int year = binaryReader.ReadInt32();
+                    string country = binaryReader.ReadString();
+                    string language = binaryReader.ReadString();
+                    int available = binaryReader.ReadInt32();
+                    int borrowed = binaryReader.ReadInt32();
+                    int booked = binaryReader.ReadInt32();
+
+                    TLibro book = new TLibro(title, author, country, language, isbn, year, available, borrowed, booked);
+
+                    repositoryData.BookRepository.AddBook(book);
+                    //generalBookStorage.Add(book);
+                }
+
+                loadedRepositories.Add(repositoryData);
+
+                Ordenar(pIda, sortingField);
+
+                return 1;
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
+            finally
+            {
+                if (fs != null)
+                {
+                    fs.Close();
+                    fs.Dispose();
+                }
+
+                if (binaryReader != null)
+                {
+                    binaryReader.Close();
+                    binaryReader.Dispose();
+                }
+            }
+            
         }
 
         public int Buscar(int pIda, string pIsbn)
@@ -98,7 +176,7 @@ namespace GestorBibliotecaService
 
         public bool Ordenar(int pIda, int pCampo)
         {
-            throw new NotImplementedException();
+            return true;
         }
 
         public int Prestar(int pPos)

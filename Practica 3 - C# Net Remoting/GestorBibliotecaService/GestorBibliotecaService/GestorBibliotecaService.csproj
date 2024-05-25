@@ -41,11 +41,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\BookRepository.cs" />
+    <Compile Include="Data\InMemoryBookRepository.cs" />
     <Compile Include="TLibro.cs" />
     <Compile Include="TDatosRepositorio.cs" />
     <Compile Include="GestorBibliotecaService.cs" />
     <Compile Include="GestorBibliotecario_inf.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Data\Handling\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
