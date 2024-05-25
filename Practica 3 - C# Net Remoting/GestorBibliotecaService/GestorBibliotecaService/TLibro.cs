@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace GestorBibliotecaService
 {
-    public class TLibro : IEquatable<TLibro>
+    [Serializable]
+    public class TLibro : IEquatable<TLibro>, ICloneable
     {
         private string titulo;
         private string autor;
@@ -92,6 +93,11 @@ namespace GestorBibliotecaService
             set { this.reservados = value; }
         }
 
+        public object Clone()
+        {
+            return this.MemberwiseClone();
+        }
+
         public override bool Equals(object obj)
         {
             return Equals(obj as TLibro);
@@ -116,6 +122,15 @@ namespace GestorBibliotecaService
         public static bool operator !=(TLibro left, TLibro right)
         {
             return !(left == right);
+        }
+
+        public override string ToString()
+        {
+            string s = "{" + this.titulo + ", " + this.autor + ", " + this.anio + ", "
+                + this.pais + ", " + this.idioma + ", " + this.isbn + ", " + this.disponibles
+                + ", " + this.prestados + ", " + this.reservados + "}";
+
+            return s;
         }
     }
 }

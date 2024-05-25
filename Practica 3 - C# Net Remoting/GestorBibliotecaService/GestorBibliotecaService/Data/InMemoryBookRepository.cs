@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace GestorBibliotecaService.Data
 {
+    [Serializable]
     public class InMemoryBookRepository : BookRepository
     {
         private List<TLibro> books = new List<TLibro>();

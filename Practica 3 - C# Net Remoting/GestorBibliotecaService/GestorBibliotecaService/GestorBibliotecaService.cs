@@ -18,7 +18,7 @@ namespace GestorBibliotecaService
 
         private int sortingField = 0;
 
-        //private List<TLibro> generalBookStorage = new List<TLibro>();
+        private List<TLibro> generalBookStorage = new List<TLibro>();
 
         public int AbrirRepositorio(int pIda, string pNomFichero)
         {
@@ -65,7 +65,7 @@ namespace GestorBibliotecaService
                     TLibro book = new TLibro(title, author, country, language, isbn, year, available, borrowed, booked);
 
                     repositoryData.BookRepository.AddBook(book);
-                    //generalBookStorage.Add(book);
+                    generalBookStorage.Add(book);
                 }
 
                 loadedRepositories.Add(repositoryData);
@@ -134,7 +134,45 @@ namespace GestorBibliotecaService
 
         public TLibro Descargar(int pIda, int pRepo, int pPos)
         {
-            throw new NotImplementedException();
+            if(pRepo != -1 && pRepo >= this.loadedRepositories.Count())
+            {
+                return null;
+            }
+
+            if(pRepo == -1)
+            {
+                if(pPos < 0 || pPos >= this.generalBookStorage.Count())
+                {
+                    return null;
+                }
+
+                TLibro generalBook = (TLibro) this.generalBookStorage.ElementAt(pPos).Clone();
+                
+                if (pIda != adminId)
+                {
+                    generalBook.Prestados = 0;
+                    generalBook.Reservados = 0;
+                }
+
+                return generalBook;
+            }
+
+            TDatosRepositorio repositoryData = this.loadedRepositories.ElementAt(pRepo);
+
+            if(pPos < 0 || pPos >= repositoryData.BookRepository.GetNumberOfBooks())
+            {
+                return null;
+            }
+
+            TLibro book = (TLibro) repositoryData.BookRepository.GetAllBooks().ElementAt(pPos).Clone();
+
+            if(pIda != adminId)
+            {
+                book.Prestados = 0;
+                book.Reservados = 0;
+            }
+
+            return book;
         }
 
         public bool Desconexion(int pIda)
@@ -161,7 +199,24 @@ namespace GestorBibliotecaService
 
         public int NLibros(int pRepo)
         {
-            throw new NotImplementedException();
+            if(pRepo != -1 && pRepo >= this.loadedRepositories.Count())
+            {
+                return -1;
+            }
+
+            if(pRepo == -1)
+            {
+                int numberOfBooks = 0;
+
+                foreach (TDatosRepositorio repositoryData in loadedRepositories)
+                {
+                    numberOfBooks += repositoryData.BookRepository.GetNumberOfBooks();
+                }
+
+                return numberOfBooks;
+            }
+
+            return this.loadedRepositories.ElementAt(pRepo).BookRepository.GetNumberOfBooks();
         }
 
         public int NRepositorios(int pIda)

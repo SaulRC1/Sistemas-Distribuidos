@@ -45,6 +45,8 @@ namespace GestorBibliotecaService
                 do
                 {
                     mainMenu.showMainMenu();
+
+                    Console.WriteLine("Selecciona una opción:");
                     Int32.TryParse(Console.ReadLine(), out option);
 
                     mainMenu.executeOption(option);

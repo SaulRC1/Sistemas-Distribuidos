@@ -1,4 +1,5 @@
 ﻿using GestorBibliotecaService.UserProperties;
+using GestorBibliotecaService.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -56,7 +57,7 @@ namespace GestorBibliotecaService.Menu
                     //executeOption7();
                     break;
                 case 8:
-                    //executeOption8();
+                    executeOption8();
                     break;
                 default:
                     Console.WriteLine("ERROR: Opción inválida.");
@@ -120,6 +121,42 @@ namespace GestorBibliotecaService.Menu
                     default:
                         break;
                 }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: " + ex.ToString());
+            }
+        }
+
+        public void executeOption8()
+        {
+            int adminId = GestorBibliotecaUserProperties.getInstance().AdminId;
+
+            BookUtils bookUtils = new BookUtils();
+
+            try
+            {
+                int totalNumberOfBooks = gestorBiblioteca.NLibros(-1);
+
+                Console.WriteLine("Número total de libros: " + totalNumberOfBooks);
+
+                for (int i = 0; i < totalNumberOfBooks; i++)
+                {
+                    TLibro book = gestorBiblioteca.Descargar(adminId, -1, i);
+
+                    if(book != null)
+                    {
+                        if (i == 0)
+                        {
+                            bookUtils.Mostrar(i, true, book);
+                        }
+                        else
+                        {
+                            bookUtils.Mostrar(i, false, book);
+                        }
+                    }  
+                }
+
             }
             catch (Exception ex)
             {

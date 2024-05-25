@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace GestorBibliotecaService
 {
+    [Serializable]
     public class TDatosRepositorio : IEquatable<TDatosRepositorio>
     {
         private string repositoryName;
