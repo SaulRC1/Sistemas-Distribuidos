@@ -43,7 +43,7 @@ namespace GestorBibliotecaService.Menu
                     //executeOption2();
                     break;
                 case 3:
-                    //executeOption3();
+                    executeOption3();
                     break;
                 case 4:
                     //executeOption4();
@@ -177,6 +177,140 @@ namespace GestorBibliotecaService.Menu
                 Console.WriteLine("ERROR: " + ex.ToString());
             }
 
+        }
+
+        public void executeOption3()
+        {
+            string isbn;
+            string author;
+            string title;
+            int year;
+            string country;
+            string language;
+            int available;
+
+            Console.WriteLine("Introduce el ISBN: ");
+            isbn = Console.ReadLine();
+
+            Console.WriteLine("Introduce el autor: ");
+            author = Console.ReadLine();
+
+            Console.WriteLine("Introduce el título: ");
+            title = Console.ReadLine();
+
+            bool yearParsed = false;
+
+            do
+            {
+                Console.WriteLine("Introduce el año:");
+                yearParsed = Int32.TryParse(Console.ReadLine(), out year);
+
+                if(!yearParsed)
+                {
+                    Console.WriteLine("Error: Introduzca un valor válido");
+                }
+
+            } while (!yearParsed);
+
+            Console.WriteLine("Introduce el país:");
+            country = Console.ReadLine();
+
+            Console.WriteLine("Introduce el idioma: ");
+            language = Console.ReadLine();
+
+            bool availableParsed = false;
+
+            do
+            {
+                Console.WriteLine("Introduce el número de libros inicial:");
+                availableParsed = Int32.TryParse(Console.ReadLine(), out available);
+
+                if (!availableParsed)
+                {
+                    Console.WriteLine("Error: Introduzca un valor válido");
+                }
+
+            } while (!availableParsed);
+
+            TLibro book = new TLibro(title, author, country, language, isbn, year,
+                    available, 0, 0);
+
+            try
+            {
+                int numberOfRepositories = gestorBiblioteca.NRepositorios(
+                        GestorBibliotecaUserProperties.getInstance().AdminId);
+
+                if (numberOfRepositories == -1)
+                {
+                    Console.WriteLine("ERROR: Ya hay otro usuario identificado como"
+                            + "administrador");
+
+                    return;
+                }
+
+                if (numberOfRepositories == 0)
+                {
+                    Console.WriteLine("ERROR: No hay repositorios cargados en la biblioteca");
+                    return;
+                }
+
+                List<TDatosRepositorio> repositories = new List<TDatosRepositorio>();
+
+                for (int i = 0; i < numberOfRepositories; i++)
+                {
+                    TDatosRepositorio repository = gestorBiblioteca.DatosRepositorio(
+                            GestorBibliotecaUserProperties.getInstance().AdminId, i);
+
+                    if (repository != null)
+                    {
+                        repositories.Add(repository);
+                    }
+                }
+
+                TDatosRepositorioUtils.showRepositoriesList(repositories);
+
+                bool repositoryPositionParsed = false;
+                int repositoryPosition;
+
+                do
+                {
+                    Console.WriteLine("Elige repositorio: ");
+                    repositoryPositionParsed = Int32.TryParse(Console.ReadLine(), out repositoryPosition);
+
+                    if (!repositoryPositionParsed)
+                    {
+                        Console.WriteLine("Error: Introduzca un valor válido");
+                    }
+
+                } while (!repositoryPositionParsed);
+
+                int result = gestorBiblioteca.NuevoLibro(GestorBibliotecaUserProperties.getInstance().AdminId,
+                        book, (repositoryPosition - 1));
+
+                switch (result)
+                {
+                    case -1:
+                        Console.WriteLine("ERROR: Ya hay un usuario identificado como "
+                                + "administrador");
+                        break;
+                    case -2:
+                        Console.WriteLine("ERROR: El repositorio indicado no existe");
+                        break;
+                    case 0:
+                        Console.WriteLine("ERROR: El libro ya existe dentro de la biblioteca");
+                        break;
+                    case 1:
+                        Console.WriteLine("** El libro ha sido añadido correctamente **");
+                        break;
+                    default:
+                        break;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("ERROR: " + ex.ToString());
+            }
         }
 
         public void executeOption7()

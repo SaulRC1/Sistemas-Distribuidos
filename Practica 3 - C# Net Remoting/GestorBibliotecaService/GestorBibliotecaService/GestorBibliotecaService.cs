@@ -98,7 +98,22 @@ namespace GestorBibliotecaService
 
         public int Buscar(int pIda, string pIsbn)
         {
-            throw new NotImplementedException();
+            if (pIda != adminId)
+            {
+                return -2;
+            }
+
+            for (int i = 0; i < generalBookStorage.Count(); i++)
+            {
+                TLibro book = generalBookStorage.ElementAt(i);
+
+                if (pIsbn == book.Isbn)
+                {
+                    return i;
+                }
+            }
+
+            return -1;
         }
 
         public int Comprar(int pIda, string pIsbn, int pNoLibros)
@@ -242,7 +257,31 @@ namespace GestorBibliotecaService
 
         public int NuevoLibro(int pIda, TLibro L, int pRepo)
         {
-            throw new NotImplementedException();
+            if (pIda != adminId)
+            {
+                return -1;
+            }
+
+            if (pRepo < 0 || pRepo >= this.loadedRepositories.Count())
+            {
+                return -2;
+            }
+
+            if(this.generalBookStorage.Contains(L))
+            {
+                return 0;
+            }
+
+            TDatosRepositorio repositoryData = this.loadedRepositories.ElementAt(pRepo);
+
+            repositoryData.BookRepository.AddBook(L);
+            repositoryData.NumberOfBooks++;
+
+            this.generalBookStorage.Add(L);
+
+            Ordenar(pIda, sortingField);
+
+            return 1;
         }
 
         public bool Ordenar(int pIda, int pCampo)
