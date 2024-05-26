@@ -43,6 +43,8 @@
   <ItemGroup>
     <Compile Include="Data\BookRepository.cs" />
     <Compile Include="Data\Handling\BookComparer.cs" />
+    <Compile Include="Data\Handling\BookSearcher.cs" />
+    <Compile Include="Data\Handling\Searcher.cs" />
     <Compile Include="Data\InMemoryBookRepository.cs" />
     <Compile Include="TLibro.cs" />
     <Compile Include="TDatosRepositorio.cs" />
@@ -50,6 +52,7 @@
     <Compile Include="GestorBibliotecario_inf.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util\BookUtils.cs" />
+    <Compile Include="Util\TDatosRepositorioUtils.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

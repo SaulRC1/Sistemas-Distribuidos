@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GestorBibliotecaService.Data.Handling;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -40,6 +41,11 @@ namespace GestorBibliotecaService.Data
             }
 
             return null;
+        }
+
+        public List<TLibro> GetBooksBy(Searcher<TLibro> searcher)
+        {
+            return searcher.Search(this.books);
         }
 
         public int GetNumberOfBooks()

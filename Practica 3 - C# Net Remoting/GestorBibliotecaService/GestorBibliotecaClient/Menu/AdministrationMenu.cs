@@ -1,4 +1,5 @@
-﻿using GestorBibliotecaService.UserProperties;
+﻿using GestorBibliotecaService.Data.Handling;
+using GestorBibliotecaService.UserProperties;
 using GestorBibliotecaService.Util;
 using System;
 using System.Collections.Generic;
@@ -54,7 +55,7 @@ namespace GestorBibliotecaService.Menu
                     executeOption6();
                     break;
                 case 7:
-                    //executeOption7();
+                    executeOption7();
                     break;
                 case 8:
                     executeOption8();
@@ -154,7 +155,7 @@ namespace GestorBibliotecaService.Menu
                 }
 
             } while (sortingCode < 0 || sortingCode > 8);
-            
+
 
             try
             {
@@ -178,6 +179,224 @@ namespace GestorBibliotecaService.Menu
 
         }
 
+        public void executeOption7()
+        {
+            string searchText = "";
+
+            Console.WriteLine("Introduce el texto a buscar: ");
+            searchText = Console.ReadLine();
+
+            string searchCode = "";
+
+            Console.WriteLine("Código de Búsqueda");
+            Console.WriteLine("I.- Por ISBN");
+            Console.WriteLine("T.- Por Título");
+            Console.WriteLine("A.- Por Autor");
+            Console.WriteLine("P.- Por País");
+            Console.WriteLine("D.- Por Idioma");
+            Console.WriteLine("*.- Por todos los campos");
+
+            do
+            {
+                Console.WriteLine("Introduce código: ");
+                searchCode = Console.ReadLine();
+
+                if (searchCode.ToLowerInvariant() != "i" && searchCode.ToLowerInvariant() != "t"
+                        && searchCode.ToLowerInvariant() != "a" && searchCode.ToLowerInvariant() != "p"
+                        && searchCode.ToLowerInvariant() != "d" && searchCode != "*")
+                {
+                    Console.WriteLine("ERORR: El código introducido no es válido");
+                }
+            } while (searchCode.ToLowerInvariant() != "i" && searchCode.ToLowerInvariant() != "t"
+                        && searchCode.ToLowerInvariant() != "a" && searchCode.ToLowerInvariant() != "p"
+                        && searchCode.ToLowerInvariant() != "d" && searchCode != "*");
+
+            try
+            {
+                int numberOfRepositories = gestorBiblioteca.NRepositorios(
+                        GestorBibliotecaUserProperties.getInstance().AdminId);
+
+                if (numberOfRepositories == -1)
+                {
+                    Console.WriteLine("ERROR: Ya hay otro usuario identificado como"
+                            + "administrador");
+
+                    return;
+                }
+
+                if (numberOfRepositories == 0)
+                {
+                    Console.WriteLine("ERROR: No hay repositorios cargados en la biblioteca");
+                    return;
+                }
+
+                List<TDatosRepositorio> repositories = new List<TDatosRepositorio>();
+
+                for (int i = 0; i < numberOfRepositories; i++)
+                {
+                    TDatosRepositorio repository = gestorBiblioteca.DatosRepositorio(
+                            GestorBibliotecaUserProperties.getInstance().AdminId,
+                            i);
+
+                    if (repository != null)
+                    {
+                        repositories.Add(repository);
+                    }
+                }
+
+                TDatosRepositorioUtils.showRepositoriesListWithAllOption(repositories);
+
+                Console.WriteLine("Elige repositorio: ");
+                int repositoryPosition;
+                Int32.TryParse(Console.ReadLine(), out repositoryPosition);
+
+                repositoryPosition--;
+
+                BookUtils bookUtils = new BookUtils();
+
+                if (repositoryPosition == -1)
+                {
+                    int adminId = GestorBibliotecaUserProperties.getInstance().AdminId;
+
+                    int totalNumberOfBooks = gestorBiblioteca.NLibros(-1);
+
+                    List<TLibro> allBooks = new List<TLibro>();
+
+                    for (int i = 0; i < totalNumberOfBooks; i++)
+                    {
+                        TLibro book = gestorBiblioteca.Descargar(adminId, -1, i);
+
+                        if (book != null)
+                        {
+                            allBooks.Add(book);
+                        }
+                    }
+
+                    bool headerShow = true;
+
+                    searchCode = searchCode.ToLowerInvariant();
+
+                    if (searchCode == BookSearcher.ISBN_SEARCH_FIELD)
+                    {
+                        for (int i = 0; i < allBooks.Count(); i++)
+                        {
+                            TLibro book = allBooks.ElementAt(i);
+
+                            if (book.Isbn.Contains(searchText))
+                            {
+                                bookUtils.Mostrar(i, headerShow, book);
+                                headerShow = false;
+                            }
+                        }
+                    }
+                    else if (searchCode == BookSearcher.TITLE_SEARCH_FIELD)
+                    {
+                        for (int i = 0; i < allBooks.Count(); i++)
+                        {
+                            TLibro book = allBooks.ElementAt(i);
+
+                            if (book.Titulo.Contains(searchText))
+                            {
+                                bookUtils.Mostrar(i, headerShow, book);
+                                headerShow = false;
+                            }
+                        }
+                    }
+                    else if (searchCode == BookSearcher.AUTHOR_SEARCH_FIELD)
+                    {
+                        for (int i = 0; i < allBooks.Count(); i++)
+                        {
+                            TLibro book = allBooks.ElementAt(i);
+
+                            if (book.Autor.Contains(searchText))
+                            {
+                                bookUtils.Mostrar(i, headerShow, book);
+                                headerShow = false;
+                            }
+                        }
+                    }
+                    else if (searchCode == BookSearcher.COUNTRY_SEARCH_FIELD)
+                    {
+                        for (int i = 0; i < allBooks.Count(); i++)
+                        {
+                            TLibro book = allBooks.ElementAt(i);
+
+                            if (book.Pais.Contains(searchText))
+                            {
+                                bookUtils.Mostrar(i, headerShow, book);
+                                headerShow = false;
+                            }
+                        }
+                    }
+                    else if (searchCode == BookSearcher.LANGUAGE_SEARCH_FIELD)
+                    {
+                        for (int i = 0; i < allBooks.Count(); i++)
+                        {
+                            TLibro book = allBooks.ElementAt(i);
+
+                            if (book.Idioma.Contains(searchText))
+                            {
+                                bookUtils.Mostrar(i, headerShow, book);
+                                headerShow = false;
+                            }
+                        }
+                    }
+                    else if (searchCode == BookSearcher.ALL_SEARCH_FIELD)
+                    {
+                        for (int i = 0; i < allBooks.Count(); i++)
+                        {
+                            TLibro book = allBooks.ElementAt(i);
+
+                            if (book.Isbn.Contains(searchText) || book.Titulo.Contains(searchText)
+                                    || book.Autor.Contains(searchText) || book.Pais.Contains(searchText)
+                                    || book.Idioma.Contains(searchText))
+                            {
+                                bookUtils.Mostrar(i, headerShow, book);
+                                headerShow = false;
+                            }
+                        }
+                    }
+
+                    //This means that no book has been found meeting the criteria
+                    if(headerShow == true)
+                    {
+                        Console.WriteLine("Error: No se ha encontrado ningún libro");
+                    }
+                }
+                else
+                {
+                    TDatosRepositorio repository = repositories.ElementAt(repositoryPosition);
+
+                    List<TLibro> foundBooks = repository.BookRepository
+                            .GetBooksBy(new BookSearcher(searchCode, searchText));
+
+                    if (foundBooks.Count == 0)
+                    {
+                        Console.WriteLine("ERROR: No hay ningun libro que coincida con la busqueda");
+                    }
+
+                    for (int i = 0; i < foundBooks.Count(); i++)
+                    {
+                        TLibro book = foundBooks.ElementAt(i);
+
+                        if (i == 0)
+                        {
+                            bookUtils.Mostrar(i, true, book);
+                        }
+                        else
+                        {
+                            bookUtils.Mostrar(i, false, book);
+                        }
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: " + ex.ToString());
+            }
+        }
+
         public void executeOption8()
         {
             int adminId = GestorBibliotecaUserProperties.getInstance().AdminId;
@@ -194,7 +413,7 @@ namespace GestorBibliotecaService.Menu
                 {
                     TLibro book = gestorBiblioteca.Descargar(adminId, -1, i);
 
-                    if(book != null)
+                    if (book != null)
                     {
                         if (i == 0)
                         {
@@ -204,7 +423,7 @@ namespace GestorBibliotecaService.Menu
                         {
                             bookUtils.Mostrar(i, false, book);
                         }
-                    }  
+                    }
                 }
 
             }

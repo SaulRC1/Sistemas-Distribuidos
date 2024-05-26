@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GestorBibliotecaService.Data.Handling;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,6 +21,6 @@ namespace GestorBibliotecaService.Data
 
         void SortBooks(IComparer<TLibro> comparer);
 
-        //List<TLibro> GetBooksBy(Searcher<TLibro> searcher);
+        List<TLibro> GetBooksBy(Searcher<TLibro> searcher);
     }
 }

@@ -130,7 +130,17 @@ namespace GestorBibliotecaService
 
         public TDatosRepositorio DatosRepositorio(int pIda, int pRepo)
         {
-            throw new NotImplementedException();
+            if(pIda != adminId)
+            {
+                return null;
+            }
+
+            if (pRepo < 0 || pRepo >= this.loadedRepositories.Count())
+            {
+                return null;
+            }
+
+            return this.loadedRepositories.ElementAt(pRepo);
         }
 
         public TLibro Descargar(int pIda, int pRepo, int pPos)
@@ -222,7 +232,12 @@ namespace GestorBibliotecaService
 
         public int NRepositorios(int pIda)
         {
-            throw new NotImplementedException();
+            if (pIda != adminId)
+            {
+                return -1;
+            }
+
+            return this.loadedRepositories.Count();
         }
 
         public int NuevoLibro(int pIda, TLibro L, int pRepo)
