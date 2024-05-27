@@ -118,7 +118,38 @@ namespace GestorBibliotecaService
 
         public int Comprar(int pIda, string pIsbn, int pNoLibros)
         {
-            throw new NotImplementedException();
+            if (pIda != adminId)
+            {
+                return -1;
+            }
+
+            int bookPosition = Buscar(pIda, pIsbn);
+
+            if (bookPosition < 0)
+            {
+                return 0;
+            }
+
+            TLibro book = this.generalBookStorage.ElementAt(bookPosition);
+
+            book.Disponibles = book.Disponibles + pNoLibros;
+
+            if (book.Disponibles >= book.Reservados)
+            {
+                book.Disponibles = book.Disponibles - book.Reservados;
+                book.Prestados = book.Prestados + book.Reservados;
+                book.Reservados = 0;
+            }
+            else
+            {
+                book.Reservados = book.Reservados - book.Disponibles;
+                book.Prestados = book.Prestados + book.Disponibles;
+                book.Disponibles = 0;
+            }
+
+            Ordenar(pIda, sortingField);
+
+            return 1;
         }
 
         public int Conexion(string pPasswd)
@@ -145,7 +176,7 @@ namespace GestorBibliotecaService
 
         public TDatosRepositorio DatosRepositorio(int pIda, int pRepo)
         {
-            if(pIda != adminId)
+            if (pIda != adminId)
             {
                 return null;
             }
@@ -267,7 +298,7 @@ namespace GestorBibliotecaService
                 return -2;
             }
 
-            if(this.generalBookStorage.Contains(L))
+            if (this.generalBookStorage.Contains(L))
             {
                 return 0;
             }
@@ -317,7 +348,30 @@ namespace GestorBibliotecaService
 
         public int Retirar(int pIda, string pIsbn, int pNoLibros)
         {
-            throw new NotImplementedException();
+            if (pIda != adminId)
+            {
+                return -1;
+            }
+
+            int bookPosition = Buscar(pIda, pIsbn);
+
+            if (bookPosition < 0)
+            {
+                return 0;
+            }
+
+            TLibro book = this.generalBookStorage.ElementAt(bookPosition);
+
+            if (book.Disponibles >= pNoLibros)
+            {
+                book.Disponibles = book.Disponibles - pNoLibros;
+
+                Ordenar(pIda, sortingField);
+
+                return 1;
+            }
+
+            return 2;
         }
     }
 }

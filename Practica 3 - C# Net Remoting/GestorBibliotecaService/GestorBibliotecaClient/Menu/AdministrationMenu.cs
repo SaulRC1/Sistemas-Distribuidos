@@ -46,10 +46,10 @@ namespace GestorBibliotecaService.Menu
                     executeOption3();
                     break;
                 case 4:
-                    //executeOption4();
+                    executeOption4();
                     break;
                 case 5:
-                    //executeOption5();
+                    executeOption5();
                     break;
                 case 6:
                     executeOption6();
@@ -205,7 +205,7 @@ namespace GestorBibliotecaService.Menu
                 Console.WriteLine("Introduce el año:");
                 yearParsed = Int32.TryParse(Console.ReadLine(), out year);
 
-                if(!yearParsed)
+                if (!yearParsed)
                 {
                     Console.WriteLine("Error: Introduzca un valor válido");
                 }
@@ -306,6 +306,201 @@ namespace GestorBibliotecaService.Menu
                         break;
                 }
 
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("ERROR: " + ex.ToString());
+            }
+        }
+
+        public void executeOption4()
+        {
+            string isbn = "";
+
+            Console.WriteLine("Introduce ISBN a buscar: ");
+            isbn = Console.ReadLine();
+
+            try
+            {
+                int result = gestorBiblioteca.Buscar(GestorBibliotecaUserProperties.getInstance()
+                        .AdminId, isbn);
+
+                switch (result)
+                {
+                    case -2:
+                        Console.WriteLine("ERROR: Ya hay un usuario identificado como"
+                                + "administrador");
+                        break;
+                    case -1:
+                        Console.WriteLine("ERROR: No se ha encontrado ningún libro con"
+                                + " el ISBN indicado");
+                        break;
+                    default:
+                        TLibro book = gestorBiblioteca.Descargar(GestorBibliotecaUserProperties.getInstance()
+                                .AdminId, -1, result);
+
+                        if (book == null)
+                        {
+                            Console.WriteLine("ERROR: El libro no existe");
+                            return;
+                        }
+
+                        BookUtils bookUtils = new BookUtils();
+                        bookUtils.Mostrar(result, true, book);
+
+                        string option = "";
+
+                        do
+                        {
+                            Console.WriteLine("¿Es este el libro del que deseas comprar"
+                                + " más unidades? (s/n)");
+                            option = Console.ReadLine().ToLowerInvariant();
+
+                            if (option != "s" && option != "n")
+                            {
+                                Console.WriteLine("ERROR: Opción incorrecta, indique"
+                                        + "sí o no");
+                            }
+                        } while (option != "s" && option != "n");
+
+                        if (option == "s")
+                        {
+                            int boughtBooks = 0;
+                            bool boughtBooksParsed = false;
+
+                            do
+                            {
+                                Console.WriteLine("Introduce el número de libros comprados:");
+                                boughtBooksParsed = Int32.TryParse(Console.ReadLine(), out boughtBooks);
+
+                                if (!boughtBooksParsed || boughtBooks < 1)
+                                {
+                                    Console.WriteLine("Error: Indique un número válido");
+                                }
+
+                            } while (!boughtBooksParsed || boughtBooks < 1);
+
+                            int buyResult = gestorBiblioteca.Comprar(GestorBibliotecaUserProperties.getInstance()
+                                .AdminId, isbn, boughtBooks);
+
+                            if (buyResult == -1)
+                            {
+                                Console.WriteLine("ERROR: Ya hay un usuario identificado como"
+                                + "administrador");
+                            }
+                            else if (buyResult == 0)
+                            {
+                                Console.WriteLine("ERROR: No se ha encontrado ningún libro con"
+                                + " el ISBN indicado");
+                            }
+                            else if (buyResult == 1)
+                            {
+                                Console.WriteLine("** Se han añadido los nuevos libros **");
+                            }
+                        }
+
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("ERROR: " + ex.ToString());
+            }
+        }
+
+        public void executeOption5()
+        {
+            string isbn = "";
+
+            Console.WriteLine("Introduce ISBN a buscar: ");
+            isbn = Console.ReadLine();
+
+            try
+            {
+                int result = gestorBiblioteca.Buscar(GestorBibliotecaUserProperties.getInstance()
+                        .AdminId, isbn);
+
+                switch (result)
+                {
+                    case -2:
+                        Console.WriteLine("ERROR: Ya hay un usuario identificado como"
+                                + "administrador");
+                        break;
+                    case -1:
+                        Console.WriteLine("ERROR: No se ha encontrado ningún libro con"
+                                + " el ISBN indicado");
+                        break;
+                    default:
+                        TLibro book = gestorBiblioteca.Descargar(GestorBibliotecaUserProperties.getInstance()
+                                .AdminId, -1, result);
+
+                        if (book == null)
+                        {
+                            Console.WriteLine("ERROR: El libro no existe");
+                            return;
+                        }
+
+                        BookUtils bookUtils = new BookUtils();
+                        bookUtils.Mostrar(result, true, book);
+
+                        string option = "";
+
+                        do
+                        {
+                            Console.WriteLine("¿Es este el libro del que deseas retirar"
+                                + " unidades? (s/n)");
+                            option = Console.ReadLine().ToLowerInvariant();
+
+                            if (option != "s" && option != "n")
+                            {
+                                Console.WriteLine("ERROR: Opción incorrecta, indique"
+                                        + "sí o no");
+                            }
+                        } while (option != "s" && option != "n");
+
+                        if (option == "s")
+                        {
+                            int removedBooks = 0;
+                            bool removedBooksParsed = false;
+
+                            do
+                            {
+                                Console.WriteLine("Introduce el número de libros a retirar:");
+                                removedBooksParsed = Int32.TryParse(Console.ReadLine(), out removedBooks);
+
+                                if(!removedBooksParsed || removedBooks < 1)
+                                {
+                                    Console.WriteLine("Error: introduzca un número válido");
+                                }
+
+                            } while (!removedBooksParsed || removedBooks < 1);
+                            
+
+                            int removeResult = gestorBiblioteca.Retirar(GestorBibliotecaUserProperties.getInstance()
+                                .AdminId, isbn, removedBooks);
+
+                            if (removeResult == -1)
+                            {
+                                Console.WriteLine("ERROR: Ya hay un usuario identificado como"
+                                + "administrador");
+                            }
+                            else if (removeResult == 0)
+                            {
+                                Console.WriteLine("ERROR: No se ha encontrado ningún libro con"
+                                + " el ISBN indicado");
+                            }
+                            else if (removeResult == 1)
+                            {
+                                Console.WriteLine("** Se han retirado el número de libros indicados **");
+                            }
+                            else if (removeResult == 2)
+                            {
+                                Console.WriteLine("ERROR: El número de libros retirados excede los disponibles");
+                            }
+                        }
+
+                        break;
+                }
             }
             catch (Exception ex)
             {
@@ -492,7 +687,7 @@ namespace GestorBibliotecaService.Menu
                     }
 
                     //This means that no book has been found meeting the criteria
-                    if(headerShow == true)
+                    if (headerShow == true)
                     {
                         Console.WriteLine("Error: No se ha encontrado ningún libro");
                     }
