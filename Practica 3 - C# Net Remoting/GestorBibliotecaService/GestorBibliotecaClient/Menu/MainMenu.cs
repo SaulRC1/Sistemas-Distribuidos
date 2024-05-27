@@ -242,6 +242,142 @@ namespace GestorBibliotecaService.Menu
             }
         }
 
+        public void executeOption3()
+        {
+            executeOption2();
+
+            string option = "";
+
+            do
+            {
+                Console.WriteLine("¿Quieres sacar algún libro de la biblioteca? (s/n)");
+                option = Console.ReadLine().ToLowerInvariant();
+
+                if (option != "s" && option != "n")
+                {
+                    Console.WriteLine("ERROR: Opción inválida. Por favor, indique "
+                            + "sí o no");
+                }
+
+            } while (option != "s" && option != "n");
+
+            if (option == "s")
+            {
+                int bookPosition = -1;
+                bool bookPositionParsed = false;
+
+                do
+                {
+                    Console.WriteLine("Introduce la posición del libro a solicitar su préstamo:");
+                    bookPositionParsed = Int32.TryParse(Console.ReadLine(), out bookPosition);
+
+                    if (!bookPositionParsed)
+                    {
+                        Console.WriteLine("Error: Introduzca una posición válida");
+                    }
+
+                } while (!bookPositionParsed);
+
+                try
+                {
+                    int result = gestorBiblioteca.Prestar((bookPosition - 1));
+
+                    switch (result)
+                    {
+                        case -1:
+                            Console.WriteLine("ERROR: La posición indicada no está dentro"
+                                    + " de los límites del repositorio mezclado y ordenado");
+                            break;
+                        case 1:
+                            Console.WriteLine("** El préstamo se ha concedido, recoja el"
+                                    + " libro en el mostrador **");
+                            break;
+                        case 0:
+                            Console.WriteLine("** Se le ha puesto en lista de espera **");
+                            break;
+                        default:
+                            break;
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error: " + ex.ToString());
+                }
+            }
+        }
+
+        public void executeOption4()
+        {
+            executeOption2();
+
+            string option = "";
+
+            do
+            {
+                Console.WriteLine("¿Quieres devolver algún libro de la biblioteca? (s/n)");
+                option = Console.ReadLine().ToLowerInvariant();
+
+                if (option != "s" && option != "n")
+                {
+                    Console.WriteLine("ERROR: Opción inválida. Por favor, indique "
+                            + "sí o no");
+                }
+
+            } while (option != "s" && option != "n");
+
+            if (option == "s")
+            {
+                int bookPosition = -1;
+                bool bookPositionParsed = false;
+
+                do
+                {
+                    Console.WriteLine("Introduce la posición del libro a devolver:");
+                    bookPositionParsed = Int32.TryParse(Console.ReadLine(), out bookPosition);
+
+                    if (!bookPositionParsed)
+                    {
+                        Console.WriteLine("Error: introduzca un valor válido");
+                    }
+
+                } while (!bookPositionParsed);
+
+                try
+                {
+                    int result = gestorBiblioteca.Devolver((bookPosition - 1));
+
+                    switch (result)
+                    {
+                        case -1:
+                            Console.WriteLine("ERROR: La posición indicada no está dentro"
+                                    + " de los límites del repositorio mezclado y ordenado");
+                            break;
+                        case 0:
+                            Console.WriteLine("** Se ha devuelto el libro y se "
+                                    + "ha reducido el número de usuarios en espera **");
+                            break;
+                        case 1:
+                            Console.WriteLine("** Se ha devuelto el libro y se "
+                                    + "pondrá en la estantería **");
+                            break;
+                        case 2:
+                            Console.WriteLine("ERROR: El libro no se puede devolver, "
+                                    + "porque no hay usuarios en lista de espera ni "
+                                    + "libros prestados");
+                            break;
+                        default:
+                            break;
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error: " + ex.ToString());
+                }
+            }
+        }
+
         public void executeOption(int optionNumber)
         {
             switch (optionNumber)
@@ -256,10 +392,10 @@ namespace GestorBibliotecaService.Menu
                     executeOption2();
                     break;
                 case 3:
-                    //executeOption3();
+                    executeOption3();
                     break;
                 case 4:
-                    //executeOption4();
+                    executeOption4();
                     break;
                 default:
                     Console.WriteLine("opción incorrecta");

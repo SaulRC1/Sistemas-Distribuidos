@@ -246,7 +246,29 @@ namespace GestorBibliotecaService
 
         public int Devolver(int pPos)
         {
-            throw new NotImplementedException();
+            if (pPos < 0 || pPos >= this.generalBookStorage.Count())
+            {
+                return -1;
+            }
+
+            TLibro book = this.generalBookStorage.ElementAt(pPos);
+
+            if (book.Reservados > 0)
+            {
+                book.Reservados = book.Reservados - 1;
+                Ordenar(adminId, sortingField);
+                return 0;
+            }
+
+            if (book.Reservados == 0 && book.Prestados > 0)
+            {
+                book.Prestados = book.Prestados - 1;
+                book.Disponibles = book.Disponibles + 1;
+                Ordenar(adminId, sortingField);
+                return 1;
+            }
+
+            return 2;
         }
 
         public int GuardarRepositorio(int pIda, int pRepo)
@@ -343,7 +365,26 @@ namespace GestorBibliotecaService
 
         public int Prestar(int pPos)
         {
-            throw new NotImplementedException();
+            if (pPos < 0 || pPos >= this.generalBookStorage.Count())
+            {
+                return -1;
+            }
+
+            TLibro book = this.generalBookStorage.ElementAt(pPos);
+
+            if (book.Disponibles > 0)
+            {
+                book.Disponibles = book.Disponibles - 1;
+                book.Prestados = book.Prestados + 1;
+                Ordenar(adminId, sortingField);
+                return 1;
+            }
+            else
+            {
+                book.Reservados = book.Reservados + 1;
+                Ordenar(adminId, sortingField);
+                return 0;
+            }
         }
 
         public int Retirar(int pIda, string pIsbn, int pNoLibros)
