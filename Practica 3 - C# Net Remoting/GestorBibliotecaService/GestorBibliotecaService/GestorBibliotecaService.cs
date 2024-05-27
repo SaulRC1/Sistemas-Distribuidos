@@ -273,7 +273,89 @@ namespace GestorBibliotecaService
 
         public int GuardarRepositorio(int pIda, int pRepo)
         {
-            throw new NotImplementedException();
+            if (pIda != adminId)
+            {
+                return -1;
+            }
+
+            if (pRepo < -1 || pRepo >= this.loadedRepositories.Count())
+            {
+                return -2;
+            }
+
+            try
+            {
+                if (pRepo == -1)
+                {
+                    foreach (TDatosRepositorio repository in loadedRepositories)
+                    {
+                        using (FileStream stream = File.Open(repository.RepositoryFilePath, FileMode.Create))
+                        {
+                            using (BinaryWriter writer = new BinaryWriter(stream, Encoding.UTF8, false))
+                            {
+                                writer.Write(repository.NumberOfBooks);
+                                writer.Write(repository.RepositoryName);
+                                writer.Write(repository.RepositoryAddress);
+
+                                List<TLibro> repositoryBooks = repository.BookRepository.GetAllBooks();
+
+                                for (int i = 0; i < repositoryBooks.Count(); i++)
+                                {
+                                    TLibro book = repositoryBooks.ElementAt(i);
+
+                                    writer.Write(book.Isbn);
+                                    writer.Write(book.Titulo);
+                                    writer.Write(book.Autor);
+                                    writer.Write(book.Anio);
+                                    writer.Write(book.Pais);
+                                    writer.Write(book.Idioma);
+                                    writer.Write(book.Disponibles);
+                                    writer.Write(book.Prestados);
+                                    writer.Write(book.Reservados);
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    TDatosRepositorio repository = this.loadedRepositories.ElementAt(pRepo);
+
+                    using (FileStream stream = File.Open(repository.RepositoryFilePath, FileMode.Create))
+                    {
+                        using (BinaryWriter writer = new BinaryWriter(stream, Encoding.UTF8, false))
+                        {
+                            writer.Write(repository.NumberOfBooks);
+                            writer.Write(repository.RepositoryName);
+                            writer.Write(repository.RepositoryAddress);
+
+                            List<TLibro> repositoryBooks = repository.BookRepository.GetAllBooks();
+
+                            for (int i = 0; i < repositoryBooks.Count(); i++)
+                            {
+                                TLibro book = repositoryBooks.ElementAt(i);
+
+                                writer.Write(book.Isbn);
+                                writer.Write(book.Titulo);
+                                writer.Write(book.Autor);
+                                writer.Write(book.Anio);
+                                writer.Write(book.Pais);
+                                writer.Write(book.Idioma);
+                                writer.Write(book.Disponibles);
+                                writer.Write(book.Prestados);
+                                writer.Write(book.Reservados);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: " + ex.ToString());
+                return 0;
+            }
+
+            return 1;
         }
 
         public int NLibros(int pRepo)

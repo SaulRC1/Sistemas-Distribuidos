@@ -40,7 +40,7 @@ namespace GestorBibliotecaService.Menu
                     executeOption1();
                     break;
                 case 2:
-                    //executeOption2();
+                    executeOption2();
                     break;
                 case 3:
                     executeOption3();
@@ -122,6 +122,87 @@ namespace GestorBibliotecaService.Menu
                     default:
                         break;
                 }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: " + ex.ToString());
+            }
+        }
+
+        public void executeOption2()
+        {
+            try
+            {
+                int numberOfRepositories = gestorBiblioteca.NRepositorios(
+                        GestorBibliotecaUserProperties.getInstance().AdminId);
+
+                if (numberOfRepositories == -1)
+                {
+                    Console.WriteLine("ERROR: Ya hay otro usuario identificado como"
+                            + "administrador");
+
+                    return;
+                }
+
+                if (numberOfRepositories == 0)
+                {
+                    Console.WriteLine("ERROR: No hay repositorios cargados en la biblioteca");
+                    return;
+                }
+
+                List<TDatosRepositorio> repositories = new List<TDatosRepositorio>();
+
+                for (int i = 0; i < numberOfRepositories; i++)
+                {
+                    TDatosRepositorio repository = gestorBiblioteca.DatosRepositorio(
+                            GestorBibliotecaUserProperties.getInstance().AdminId,
+                            i);
+
+                    if (repository != null)
+                    {
+                        repositories.Add(repository);
+                    }
+                }
+
+                TDatosRepositorioUtils.showRepositoriesListWithAllOption(repositories);
+
+                int repositoryPosition;
+                bool repositoryPositionParsed = false;
+
+                do
+                {
+                    Console.WriteLine("Elige repositorio: ");
+                    repositoryPositionParsed = Int32.TryParse(Console.ReadLine(), out repositoryPosition);
+
+                    if (!repositoryPositionParsed)
+                    {
+                        Console.WriteLine("Error: introduzca un valor válido");
+                    }
+
+                } while (!repositoryPositionParsed);
+                
+
+                int result = gestorBiblioteca.GuardarRepositorio(GestorBibliotecaUserProperties
+                        .getInstance().AdminId, (repositoryPosition - 1));
+
+                if (result == -1)
+                {
+                    Console.WriteLine("ERROR: Ya hay un usuario identificado como"
+                            + " administrador");
+                }
+                else if (result == -2)
+                {
+                    Console.WriteLine("ERROR: El repositorio indicado no existe");
+                }
+                else if (result == 0)
+                {
+                    Console.WriteLine("ERROR: No se ha podido guardar el/los repositorio/s");
+                }
+                else if (result == 1)
+                {
+                    Console.WriteLine("** Se ha guardado el/los repositorio/s **");
+                }
+
             }
             catch (Exception ex)
             {
@@ -468,13 +549,13 @@ namespace GestorBibliotecaService.Menu
                                 Console.WriteLine("Introduce el número de libros a retirar:");
                                 removedBooksParsed = Int32.TryParse(Console.ReadLine(), out removedBooks);
 
-                                if(!removedBooksParsed || removedBooks < 1)
+                                if (!removedBooksParsed || removedBooks < 1)
                                 {
                                     Console.WriteLine("Error: introduzca un número válido");
                                 }
 
                             } while (!removedBooksParsed || removedBooks < 1);
-                            
+
 
                             int removeResult = gestorBiblioteca.Retirar(GestorBibliotecaUserProperties.getInstance()
                                 .AdminId, isbn, removedBooks);
