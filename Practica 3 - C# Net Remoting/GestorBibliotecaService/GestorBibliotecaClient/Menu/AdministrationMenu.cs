@@ -1,4 +1,5 @@
-﻿using GestorBibliotecaService.Data.Handling;
+﻿using GestorBibliotecaService.Data;
+using GestorBibliotecaService.Data.Handling;
 using GestorBibliotecaService.UserProperties;
 using GestorBibliotecaService.Util;
 using System;
@@ -775,10 +776,22 @@ namespace GestorBibliotecaService.Menu
                 }
                 else
                 {
-                    TDatosRepositorio repository = repositories.ElementAt(repositoryPosition);
+                    int repositoryNumberOfBooks = gestorBiblioteca.NLibros(repositoryPosition);
 
-                    List<TLibro> foundBooks = repository.BookRepository
-                            .GetBooksBy(new BookSearcher(searchCode, searchText));
+                    BookRepository bookRepository = new InMemoryBookRepository();
+
+                    for (int i = 0; i < repositoryNumberOfBooks; i++)
+                    {
+                        TLibro book = gestorBiblioteca.Descargar(GestorBibliotecaUserProperties.getInstance().AdminId,
+                            repositoryPosition, i);
+
+                        if(book != null)
+                        {
+                            bookRepository.AddBook(book);
+                        }
+                    }
+
+                    List<TLibro> foundBooks = bookRepository.GetBooksBy(new BookSearcher(searchCode, searchText));
 
                     if (foundBooks.Count == 0)
                     {

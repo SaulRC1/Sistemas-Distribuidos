@@ -15,6 +15,7 @@ namespace GestorBibliotecaService
         private int numberOfBooks;
         private string repositoryFilePath;
 
+        [NonSerialized]
         private BookRepository bookRepository;
 
         public TDatosRepositorio()
