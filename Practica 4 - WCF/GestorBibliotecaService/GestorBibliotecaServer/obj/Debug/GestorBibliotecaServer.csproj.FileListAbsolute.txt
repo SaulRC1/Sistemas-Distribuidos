@@ -1,0 +1,10 @@
+C:\Users\SaulRC1\Documents\4º Ingeniería Informática\Sistemas-Distribuidos\Practica 4 - WCF\GestorBibliotecaService\GestorBibliotecaServer\bin\Debug\GestorBibliotecaServer.exe.config
+C:\Users\SaulRC1\Documents\4º Ingeniería Informática\Sistemas-Distribuidos\Practica 4 - WCF\GestorBibliotecaService\GestorBibliotecaServer\bin\Debug\GestorBibliotecaServer.exe
+C:\Users\SaulRC1\Documents\4º Ingeniería Informática\Sistemas-Distribuidos\Practica 4 - WCF\GestorBibliotecaService\GestorBibliotecaServer\bin\Debug\GestorBibliotecaServer.pdb
+C:\Users\SaulRC1\Documents\4º Ingeniería Informática\Sistemas-Distribuidos\Practica 4 - WCF\GestorBibliotecaService\GestorBibliotecaServer\bin\Debug\GestorBibliotecaService.dll
+C:\Users\SaulRC1\Documents\4º Ingeniería Informática\Sistemas-Distribuidos\Practica 4 - WCF\GestorBibliotecaService\GestorBibliotecaServer\bin\Debug\GestorBibliotecaService.pdb
+C:\Users\SaulRC1\Documents\4º Ingeniería Informática\Sistemas-Distribuidos\Practica 4 - WCF\GestorBibliotecaService\GestorBibliotecaServer\obj\Debug\GestorBibliotecaServer.csproj.AssemblyReference.cache
+C:\Users\SaulRC1\Documents\4º Ingeniería Informática\Sistemas-Distribuidos\Practica 4 - WCF\GestorBibliotecaService\GestorBibliotecaServer\obj\Debug\GestorBibliotecaServer.csproj.CoreCompileInputs.cache
+C:\Users\SaulRC1\Documents\4º Ingeniería Informática\Sistemas-Distribuidos\Practica 4 - WCF\GestorBibliotecaService\GestorBibliotecaServer\obj\Debug\GestorBibliotecaServer.csproj.CopyComplete
+C:\Users\SaulRC1\Documents\4º Ingeniería Informática\Sistemas-Distribuidos\Practica 4 - WCF\GestorBibliotecaService\GestorBibliotecaServer\obj\Debug\GestorBibliotecaServer.exe
+C:\Users\SaulRC1\Documents\4º Ingeniería Informática\Sistemas-Distribuidos\Practica 4 - WCF\GestorBibliotecaService\GestorBibliotecaServer\obj\Debug\GestorBibliotecaServer.pdb
