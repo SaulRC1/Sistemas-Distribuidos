@@ -694,96 +694,12 @@ namespace GestorBibliotecaClient.Menu
 
                     searchCode = searchCode.ToLowerInvariant();
 
-                    if (searchCode == "i")
-                    {
-                        for (int i = 0; i < allBooks.Count(); i++)
-                        {
-                            TLibro book = allBooks.ElementAt(i);
-
-                            if (book.Isbn.Contains(searchText))
-                            {
-                                bookUtils.Mostrar(i, headerShow, book);
-                                headerShow = false;
-                            }
-                        }
-                    }
-                    else if (searchCode == "t")
-                    {
-                        for (int i = 0; i < allBooks.Count(); i++)
-                        {
-                            TLibro book = allBooks.ElementAt(i);
-
-                            if (book.Titulo.Contains(searchText))
-                            {
-                                bookUtils.Mostrar(i, headerShow, book);
-                                headerShow = false;
-                            }
-                        }
-                    }
-                    else if (searchCode == "a")
-                    {
-                        for (int i = 0; i < allBooks.Count(); i++)
-                        {
-                            TLibro book = allBooks.ElementAt(i);
-
-                            if (book.Autor.Contains(searchText))
-                            {
-                                bookUtils.Mostrar(i, headerShow, book);
-                                headerShow = false;
-                            }
-                        }
-                    }
-                    else if (searchCode == "p")
-                    {
-                        for (int i = 0; i < allBooks.Count(); i++)
-                        {
-                            TLibro book = allBooks.ElementAt(i);
-
-                            if (book.Pais.Contains(searchText))
-                            {
-                                bookUtils.Mostrar(i, headerShow, book);
-                                headerShow = false;
-                            }
-                        }
-                    }
-                    else if (searchCode == "d")
-                    {
-                        for (int i = 0; i < allBooks.Count(); i++)
-                        {
-                            TLibro book = allBooks.ElementAt(i);
-
-                            if (book.Idioma.Contains(searchText))
-                            {
-                                bookUtils.Mostrar(i, headerShow, book);
-                                headerShow = false;
-                            }
-                        }
-                    }
-                    else if (searchCode == "*")
-                    {
-                        for (int i = 0; i < allBooks.Count(); i++)
-                        {
-                            TLibro book = allBooks.ElementAt(i);
-
-                            if (book.Isbn.Contains(searchText) || book.Titulo.Contains(searchText)
-                                    || book.Autor.Contains(searchText) || book.Pais.Contains(searchText)
-                                    || book.Idioma.Contains(searchText))
-                            {
-                                bookUtils.Mostrar(i, headerShow, book);
-                                headerShow = false;
-                            }
-                        }
-                    }
-
-                    //This means that no book has been found meeting the criteria
-                    if (headerShow == true)
-                    {
-                        Console.WriteLine("Error: No se ha encontrado ningún libro");
-                    }
+                    searchBooks(searchCode, allBooks, headerShow, searchText);
                 }
                 else
                 {
                     int repositoryNumberOfBooks = gestorBiblioteca.NLibros(repositoryPosition);
+                    List<TLibro> repositoryBooks = new List<TLibro>();
 
                     for (int i = 0; i < repositoryNumberOfBooks; i++)
                     {
@@ -792,32 +708,16 @@ namespace GestorBibliotecaClient.Menu
 
                         if(book != null)
                         {
-                            //bookRepository.AddBook(book);
+                            repositoryBooks.Add(book);
                         }
                     }
 
-                    List<TLibro> foundBooks = new List<TLibro>();//bookRepository.GetBooksBy(new BookSearcher(searchCode, searchText));
+                    bool headerShow = true;
 
-                    if (foundBooks.Count == 0)
-                    {
-                        Console.WriteLine("ERROR: No hay ningun libro que coincida con la busqueda");
-                    }
+                    searchCode = searchCode.ToLowerInvariant();
 
-                    for (int i = 0; i < foundBooks.Count(); i++)
-                    {
-                        TLibro book = foundBooks.ElementAt(i);
-
-                        if (i == 0)
-                        {
-                            bookUtils.Mostrar(i, true, book);
-                        }
-                        else
-                        {
-                            bookUtils.Mostrar(i, false, book);
-                        }
-                    }
+                    searchBooks(searchCode, repositoryBooks, headerShow, searchText);
                 }
-
             }
             catch (Exception ex)
             {
@@ -858,6 +758,98 @@ namespace GestorBibliotecaClient.Menu
             catch (Exception ex)
             {
                 Console.WriteLine("Error: " + ex.ToString());
+            }
+        }
+
+        private void searchBooks(string searchCode, List<TLibro> books, bool headerShow, string searchText)
+        {
+            BookUtils bookUtils = new BookUtils();
+
+            if (searchCode == "i")
+            {
+                for (int i = 0; i < books.Count(); i++)
+                {
+                    TLibro book = books.ElementAt(i);
+
+                    if (book.Isbn.Contains(searchText))
+                    {
+                        bookUtils.Mostrar(i, headerShow, book);
+                        headerShow = false;
+                    }
+                }
+            }
+            else if (searchCode == "t")
+            {
+                for (int i = 0; i < books.Count(); i++)
+                {
+                    TLibro book = books.ElementAt(i);
+
+                    if (book.Titulo.Contains(searchText))
+                    {
+                        bookUtils.Mostrar(i, headerShow, book);
+                        headerShow = false;
+                    }
+                }
+            }
+            else if (searchCode == "a")
+            {
+                for (int i = 0; i < books.Count(); i++)
+                {
+                    TLibro book = books.ElementAt(i);
+
+                    if (book.Autor.Contains(searchText))
+                    {
+                        bookUtils.Mostrar(i, headerShow, book);
+                        headerShow = false;
+                    }
+                }
+            }
+            else if (searchCode == "p")
+            {
+                for (int i = 0; i < books.Count(); i++)
+                {
+                    TLibro book = books.ElementAt(i);
+
+                    if (book.Pais.Contains(searchText))
+                    {
+                        bookUtils.Mostrar(i, headerShow, book);
+                        headerShow = false;
+                    }
+                }
+            }
+            else if (searchCode == "d")
+            {
+                for (int i = 0; i < books.Count(); i++)
+                {
+                    TLibro book = books.ElementAt(i);
+
+                    if (book.Idioma.Contains(searchText))
+                    {
+                        bookUtils.Mostrar(i, headerShow, book);
+                        headerShow = false;
+                    }
+                }
+            }
+            else if (searchCode == "*")
+            {
+                for (int i = 0; i < books.Count(); i++)
+                {
+                    TLibro book = books.ElementAt(i);
+
+                    if (book.Isbn.Contains(searchText) || book.Titulo.Contains(searchText)
+                            || book.Autor.Contains(searchText) || book.Pais.Contains(searchText)
+                            || book.Idioma.Contains(searchText))
+                    {
+                        bookUtils.Mostrar(i, headerShow, book);
+                        headerShow = false;
+                    }
+                }
+            }
+
+            //This means that no book has been found meeting the criteria
+            if (headerShow == true)
+            {
+                Console.WriteLine("Error: No se ha encontrado ningún libro");
             }
         }
     }
